@@ -1,0 +1,17 @@
+{
+  "defaultProject": "PROJ",
+  "defaultIssueType": "Task",
+  "parentLinkage": "parent",
+  "contentLanguage": "en",
+  "stacks": {
+    "Mobile":  { "components": ["Mobile"],  "labels": ["mobile"] },
+    "Backend": { "components": ["Backend"], "labels": ["backend"] },
+    "Web":     { "components": ["Web"],     "labels": ["web"] },
+    "QA":      { "components": ["QA"],      "labels": ["qa"] },
+    "Design":  { "components": ["Design"],  "labels": ["design"] },
+    "DevOps":  { "components": ["DevOps"],  "labels": ["devops"] }
+  },
+  "inheritFromStory": ["priority", "components", "labels", "fixVersions"],
+  "alwaysAddLabels": [],
+  "defaultAssignee": null
+}

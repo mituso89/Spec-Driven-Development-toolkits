@@ -1,0 +1,12 @@
+# Keep line endings LF everywhere so the shell scripts run under bash on every OS
+# — including Windows / Git Bash. Without this, a Windows clone with the default
+# autocrlf=true rewrites scripts with CRLF and bash fails ("bad interpreter",
+# "'\r': command not found") before any logic runs.
+* text=auto eol=lf
+
+# Be explicit for the files that are actually executed or sourced.
+*.sh        text eol=lf
+*.md        text eol=lf
+*.json      text eol=lf
+install.sh  text eol=lf
+vendor.sh   text eol=lf

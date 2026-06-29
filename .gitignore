@@ -1,0 +1,11 @@
+.DS_Store
+*.tmp
+
+# Build artifact from make-dist.sh (the recipient ZIP) — rebuild, don't commit
+/sdd-toolkit.zip
+dist/
+
+# Local skill config — never commit real credentials (use *.example.json as the template)
+config.json
+*.local.json
+.env

@@ -61,6 +61,10 @@ You drive it by talking to Devin CLI. Each phase is a skill (`h-sdd`, `h-sdd-spe
 - It **never overwrites your own skills.** If you already have a skill with the same name, the installer leaves yours alone.
 - Fully self-contained — no accounts, no servers, nothing tied to one machine. Re-run `bash install.sh` anytime to update.
 - **Uninstall:** delete the `h-*` folders the installer added — under `~/.config/devin/skills/` on Mac, or `%APPDATA%\devin\skills\` on Windows.
+- **Quality companions per project:** to also drop the five quality skills into a specific project's `.devin/skills/`, run:
+  ```bash
+  bash install.sh --project /path/to/your-project
+  ```
 
 <details>
 <summary>🛟 &nbsp;Something went wrong?</summary>
@@ -81,7 +85,7 @@ Clone and install in one go:
 ```bash
 git clone <your-repo-url> sdd-toolkit && cd sdd-toolkit && bash install.sh
 ```
-On Mac/Linux `install.sh` **symlinks** each `h-*` skill into `~/.config/devin/skills/` (edit-in-place); on Windows/Git Bash it **copies** them (native symlinks need Developer Mode) and marks each with a hidden `.sdd-vendored` file so re-runs update cleanly without touching skills you wrote yourself. Every skill the pipeline needs is vendored in this repo — no external skill prerequisites.
+On Mac/Linux `install.sh` **symlinks** each `h-*` skill into `~/.config/devin/skills/` (edit-in-place); on Windows/Git Bash it **copies** them (native symlinks need Developer Mode) and marks each with a hidden `.sdd-vendored` file so re-runs update cleanly without touching skills you wrote yourself. Every skill the pipeline needs is vendored in this repo — no external skill prerequisites. Re-sync quality skills from a local `agent-skills` clone: `AGENT_SKILLS_SRC=/path/to/agent-skills/skills bash vendor.sh`
 
 </details>
 
@@ -165,6 +169,7 @@ The pipeline's delegates are vendored here (vendored upstream skills gain an `h-
 | plan | `h-writing-plans` |
 | implement | `h-subagent-driven-development` (or `h-executing-plans`), `h-using-git-worktrees`/`h-worktree`, `h-finishing-a-development-branch`, `h-git-commit` |
 | tasks-to-issues | `h-story-breakdown` (+ Atlassian MCP) |
+| quality companions (optional) | `h-security-and-hardening`, `h-performance-optimization`, `h-debugging-and-error-recovery`, `h-api-and-interface-design`, `h-frontend-ui-engineering` |
 
 Plus transitive deps (`h-test-driven-development`, `h-requesting-code-review`, `h-receiving-code-review`). Refresh the vendored copies from your live skills with `bash vendor.sh`.
 

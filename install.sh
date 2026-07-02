@@ -38,7 +38,8 @@ if [ -z "$PROJECT_DIR" ] && [ -z "$TOOL_NAME" ]; then
 fi
 
 # --project: copy quality companion skills into a target project's .devin/skills/
-if [ -n "$PROJECT_DIR" ]; then
+# (only when --tool is not also given — --tool handles its own project install)
+if [ -n "$PROJECT_DIR" ] && [ -z "$TOOL_NAME" ]; then
   QUALITY_SKILLS="m-security-and-hardening m-performance-optimization \
 m-debugging-and-error-recovery m-api-and-interface-design m-frontend-ui-engineering"
   PROJ_DEST="$PROJECT_DIR/.devin/skills"

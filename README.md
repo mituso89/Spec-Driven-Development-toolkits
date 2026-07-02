@@ -66,6 +66,29 @@ You drive it by talking to Devin CLI. Each phase is a skill (`h-sdd`, `h-sdd-spe
   bash install.sh --project /path/to/your-project
   ```
 
+### Multi-tool support (Claude Code, Cursor, Windsurf, AGENTS.md)
+
+The SDD pipeline can be installed into any project for use with tools other than Devin CLI — Claude Code, Cursor, Windsurf, or any tool that reads `AGENTS.md`.
+
+Run this after the global install:
+```bash
+# Claude Code
+bash install.sh --tool claude --project /path/to/your-project
+
+# Cursor
+bash install.sh --tool cursor --project /path/to/your-project
+
+# Windsurf
+bash install.sh --tool windsurf --project /path/to/your-project
+
+# Generic (any tool reading AGENTS.md)
+bash install.sh --tool agents --project /path/to/your-project
+```
+
+This writes a single Markdown adapter file (e.g. `.claude/CLAUDE.md`) and `.sdd/pipeline.md` into your project. The adapter contains the full pipeline instructions for all phases. Non-Devin tools track phase state in `.sdd/pipeline.md` (a Markdown table) instead of `sdd-lib.sh`.
+
+Commit both files to your project repo alongside `.sdd/constitution.md` and `specs/`.
+
 <details>
 <summary>🛟 &nbsp;Something went wrong?</summary>
 
@@ -86,6 +109,8 @@ Clone and install in one go:
 git clone <your-repo-url> sdd-toolkit && cd sdd-toolkit && bash install.sh
 ```
 On Mac/Linux `install.sh` **symlinks** each `h-*` skill into `~/.config/devin/skills/` (edit-in-place); on Windows/Git Bash it **copies** them (native symlinks need Developer Mode) and marks each with a hidden `.sdd-vendored` file so re-runs update cleanly without touching skills you wrote yourself. Every skill the pipeline needs is vendored in this repo — no external skill prerequisites. Re-sync quality skills from a local `agent-skills` clone: `AGENT_SKILLS_SRC=/path/to/agent-skills/skills bash vendor.sh`
+
+Each pipeline phase also has a `phase-instructions.md` — the tool-agnostic canonical source. `SKILL.md` is the Devin adapter (YAML frontmatter + shell calls). `vendor.sh` re-syncs both automatically.
 
 </details>
 

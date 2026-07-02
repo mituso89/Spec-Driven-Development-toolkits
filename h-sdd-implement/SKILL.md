@@ -17,6 +17,8 @@ description: "SDD phase 7 — execute the plan/tasks by delegating to h-subagent
 - `sdd_require "$root" "$id" analyze "done,skipped"` — analyze must have run clean or been explicitly skipped; never implement on a still-`pending`/`in_progress` consistency gate.
 - **Human GO gate — the point of no return into code (load-bearing).** Before writing any code: summarize what will be built (the `tasks.md` list), the target branch/worktree, and any open analyze findings the user must own; then get the user's explicit "go". If not confirmed, stop. Do NOT proceed autonomously past this point.
 
+> Optional companion: if implementation hits unexpected failures or test breakages, run `h-debugging-and-error-recovery` for structured root-cause triage before retrying.
+
 ## Phase 1 — Execute
 - `sdd_set_phase "$root" "$id" implement in_progress`
 - Isolation: use **h-worktree** (or `h-using-git-worktrees`) to create a feature branch/worktree.

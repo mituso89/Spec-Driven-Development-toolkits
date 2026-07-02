@@ -31,6 +31,8 @@ description: "SDD phase 6 (optional gate) — cross-check constitution, spec, pl
   - **Scope:** still a single implementable unit (else recommend decomposition).
 - Classify each finding `blocking` or `non-blocking`.
 
+> Optional companions: before recording the verdict, run `h-security-and-hardening` to check for security gaps and `h-performance-optimization` to check for performance regressions. Findings from either feed into this phase's analysis.md as non-blocking notes unless the constitution mandates otherwise.
+
 ## Phase 2 — Record & route
 - If any `blocking` findings: leave `analyze` `in_progress`, report them, and send the user back to the relevant phase (`h-sdd-specify`/`h-sdd-plan`/`h-sdd-tasks`).
 - If clean (or user accepts non-blocking): `sdd_set_phase "$root" "$id" analyze done`; route to `h-sdd-implement`. To skip entirely: `sdd_set_phase "$root" "$id" analyze skipped`.

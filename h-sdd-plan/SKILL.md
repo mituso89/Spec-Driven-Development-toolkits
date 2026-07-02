@@ -28,3 +28,5 @@ description: "SDD phase 4 — produce the technical implementation plan by deleg
 - **Human approval gate (load-bearing):** present the plan to the user and get explicit approval — architecture and task decomposition are cheap to fix on paper, expensive in code. Only on approval: `sdd_set_phase "$root" "$id" plan approved`.
 - If the user requests changes, revise and re-present; leave the phase `in_progress` (do NOT mark `approved`). Never advance to tasks/implement on an unapproved plan.
 - Route to `h-sdd-tasks`.
+
+> Optional companions: if the spec involves an API or module boundary, run `h-api-and-interface-design` while drafting the plan. If the spec involves user-facing UI, run `h-frontend-ui-engineering`. Neither blocks the approval gate.

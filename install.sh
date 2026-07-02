@@ -58,11 +58,17 @@ if [ -z "$PROJECT_DIR" ] && [ -z "$TOOL_NAME" ]; then
   echo "Done. Restart Devin CLI or re-scan skills if needed."
 fi
 
-# --quality: copy quality companion skills into a target project's .devin/skills/
+# --quality: copy quality companion skills into the right skills dir for the target tool
 if [ "$INSTALL_QUALITY" -eq 1 ]; then
   QUALITY_SKILLS="m-security-and-hardening m-performance-optimization \
 m-debugging-and-error-recovery m-api-and-interface-design m-frontend-ui-engineering"
-  PROJ_DEST="$PROJECT_DIR/.devin/skills"
+  # Route to the correct skills directory based on the target tool
+  case "$TOOL_NAME" in
+    claude)            PROJ_DEST="$PROJECT_DIR/.claude/skills" ;;
+    cursor|windsurf)   PROJ_DEST="$PROJECT_DIR/.cursor/skills" ;;
+    agents|"")         PROJ_DEST="$PROJECT_DIR/.devin/skills" ;;
+    *)                 PROJ_DEST="$PROJECT_DIR/.devin/skills" ;;
+  esac
   mkdir -p "$PROJ_DEST"
   echo "Installing quality companion skills into $PROJ_DEST"
   for skill in $QUALITY_SKILLS; do
@@ -77,7 +83,7 @@ m-debugging-and-error-recovery m-api-and-interface-design m-frontend-ui-engineer
     cp -R "$src" "$target"
     echo "  installed $skill -> $target"
   done
-  echo "Done. Restart Devin CLI in the project to load them."
+  echo "Done. Restart your AI tool in the project to load them."
 fi
 
 # --tool: write a non-Devin adapter + .sdd/pipeline.md into a target project

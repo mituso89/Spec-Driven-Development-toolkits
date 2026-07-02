@@ -22,6 +22,22 @@ for s in $HSK; do
   else echo "  WARN missing $s"; fi
 done
 
+# agent-skills quality companions -> vendored as h-<name>
+AGENT_SKILLS_SRC="${AGENT_SKILLS_SRC:-$HOME/work/agent-skills/skills}"
+AGENT_SKILLS="security-and-hardening performance-optimization \
+debugging-and-error-recovery api-and-interface-design frontend-ui-engineering"
+
+echo "== 1b. copy from agent-skills =="
+for s in $AGENT_SKILLS; do
+  if [ -d "$AGENT_SKILLS_SRC/$s" ]; then
+    rm -rf "$DEST/h-$s"
+    cp -R "$AGENT_SKILLS_SRC/$s" "$DEST/h-$s"
+    echo "  vendored $s -> h-$s"
+  else
+    echo "  WARN missing $AGENT_SKILLS_SRC/$s"
+  fi
+done
+
 echo "== 2. rewrite references across all .md (h-sdd* + vendored) =="
 # For each vendored upstream name: superpowers:<n> -> h-<n>, then bare <n> -> h-<n>
 # (the (?<!h-) lookbehind avoids turning h-<n> into h-h-<n>).

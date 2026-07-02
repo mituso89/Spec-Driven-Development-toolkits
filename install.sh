@@ -1,22 +1,43 @@
 #!/usr/bin/env bash
-# Symlink every bundled skill (m-*) into ~/.config/devin/skills so Devin CLI loads them.
-# NEVER clobbers an existing REAL dir — preserves a user's own hand-authored skills
-# (e.g. your original m-ask); only that user's missing skills get the vendored copy.
+# install.sh — SDD toolkit installer
+#
+# Usage:
+#   bash install.sh
+#     → Global Devin install: symlink all m-* skills into ~/.config/devin/skills/
+#
+#   bash install.sh --quality --project <path>
+#     → Copy quality companion skills into <path>/.devin/skills/
+#
+#   bash install.sh --tool <name> --project <path>
+#     → Write SDD pipeline adapter for a non-Devin tool into <path>
+#       Supported tools: claude, cursor, windsurf, agents
+#
+#   bash install.sh --tool <name> --quality --project <path>
+#     → Both adapter and quality skills
+#
+# NEVER clobbers existing skills or adapter files you already have.
 set -euo pipefail
 PROJECT_DIR=""
 TOOL_NAME=""
+INSTALL_QUALITY=0
 while [[ $# -gt 0 ]]; do
   case "$1" in
     --project) PROJECT_DIR="$2"; shift 2 ;;
     --tool)    TOOL_NAME="$2";    shift 2 ;;
+    --quality) INSTALL_QUALITY=1; shift ;;
     *) echo "Unknown argument: $1"; exit 1 ;;
   esac
 done
 
-# Validate: --tool requires --project
+# Validate: --tool and --quality require --project
 if [ -n "$TOOL_NAME" ] && [ -z "$PROJECT_DIR" ]; then
   echo "Error: --tool requires --project <path>."
   echo "Example: bash install.sh --tool claude --project /path/to/your-project"
+  exit 1
+fi
+if [ "$INSTALL_QUALITY" -eq 1 ] && [ -z "$PROJECT_DIR" ]; then
+  echo "Error: --quality requires --project <path>."
+  echo "Example: bash install.sh --quality --project /path/to/your-project"
   exit 1
 fi
 SRC="$(cd "$(dirname "$0")" && pwd)"
@@ -37,9 +58,8 @@ if [ -z "$PROJECT_DIR" ] && [ -z "$TOOL_NAME" ]; then
   echo "Done. Restart Devin CLI or re-scan skills if needed."
 fi
 
-# --project: copy quality companion skills into a target project's .devin/skills/
-# (only when --tool is not also given — --tool handles its own project install)
-if [ -n "$PROJECT_DIR" ] && [ -z "$TOOL_NAME" ]; then
+# --quality: copy quality companion skills into a target project's .devin/skills/
+if [ "$INSTALL_QUALITY" -eq 1 ]; then
   QUALITY_SKILLS="m-security-and-hardening m-performance-optimization \
 m-debugging-and-error-recovery m-api-and-interface-design m-frontend-ui-engineering"
   PROJ_DEST="$PROJECT_DIR/.devin/skills"

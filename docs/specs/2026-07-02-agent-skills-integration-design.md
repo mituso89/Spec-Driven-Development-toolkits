@@ -140,7 +140,9 @@ bash install.sh --project /path/to/my-project
 
 **Behavior:**
 - Creates `<project>/.devin/skills/` if absent
-- Skips any skill that already exists (same "never clobber" rule)
+- Skips any skill directory that already exists in the target (checks with
+  `[ -e "$target" ]`; no `.sdd-vendored` marker used for project installs
+  since the project may not use the toolkit's marker convention)
 - Prints `installed h-<name> → <project>/.devin/skills/<name>` per skill
 
 ---

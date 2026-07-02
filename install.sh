@@ -1,43 +1,74 @@
 #!/usr/bin/env bash
-# Symlink every bundled skill (h-*) into ~/.config/devin/skills so Devin CLI loads them.
-# NEVER clobbers an existing REAL dir — preserves a user's own hand-authored skills
-# (e.g. your original h-ask); only that user's missing skills get the vendored copy.
+# install.sh — SDD toolkit installer
+#
+# Usage:
+#   bash install.sh
+#     → Global Devin install: symlink all h-* skills into ~/.config/devin/skills/
+#
+#   bash install.sh --quality --project <path>
+#     → Copy quality companion skills into <path>/.devin/skills/
+#
+#   bash install.sh --tool <name> --project <path>
+#     → Write SDD pipeline adapter for a non-Devin tool into <path>
+#       Supported tools: claude, cursor, windsurf, agents
+#
+#   bash install.sh --tool <name> --quality --project <path>
+#     → Both adapter and quality skills
+#
+# NEVER clobbers existing skills or adapter files you already have.
 set -euo pipefail
 PROJECT_DIR=""
 TOOL_NAME=""
+INSTALL_QUALITY=0
 while [[ $# -gt 0 ]]; do
   case "$1" in
     --project) PROJECT_DIR="$2"; shift 2 ;;
     --tool)    TOOL_NAME="$2";    shift 2 ;;
+    --quality) INSTALL_QUALITY=1; shift ;;
     *) echo "Unknown argument: $1"; exit 1 ;;
   esac
 done
 
-# Validate: --tool requires --project
+# Validate: --tool and --quality require --project
 if [ -n "$TOOL_NAME" ] && [ -z "$PROJECT_DIR" ]; then
   echo "Error: --tool requires --project <path>."
   echo "Example: bash install.sh --tool claude --project /path/to/your-project"
   exit 1
 fi
+if [ "$INSTALL_QUALITY" -eq 1 ] && [ -z "$PROJECT_DIR" ]; then
+  echo "Error: --quality requires --project <path>."
+  echo "Example: bash install.sh --quality --project /path/to/your-project"
+  exit 1
+fi
 SRC="$(cd "$(dirname "$0")" && pwd)"
-DEST="$HOME/.config/devin/skills"
-mkdir -p "$DEST"
-for d in "$SRC"/h-*; do
-  [ -d "$d" ] || continue
-  name="$(basename "$d")"
-  if [ -e "$DEST/$name" ] && [ ! -L "$DEST/$name" ]; then
-    echo "skip $name (your own real skill — left untouched)"; continue
-  fi
-  ln -sfn "$d" "$DEST/$name"
-  echo "linked $name"
-done
-echo "Done. Restart Devin CLI or re-scan skills if needed."
 
-# --project: copy quality companion skills into a target project's .devin/skills/
-if [ -n "$PROJECT_DIR" ]; then
+# Global Devin install — only when no --project or --tool flag given
+if [ -z "$PROJECT_DIR" ] && [ -z "$TOOL_NAME" ]; then
+  DEST="$HOME/.config/devin/skills"
+  mkdir -p "$DEST"
+  for d in "$SRC"/h-*; do
+    [ -d "$d" ] || continue
+    name="$(basename "$d")"
+    if [ -e "$DEST/$name" ] && [ ! -L "$DEST/$name" ]; then
+      echo "skip $name (your own real skill — left untouched)"; continue
+    fi
+    ln -sfn "$d" "$DEST/$name"
+    echo "linked $name"
+  done
+  echo "Done. Restart Devin CLI or re-scan skills if needed."
+fi
+
+# --quality: copy quality companion skills into the right skills dir for the target tool
+if [ "$INSTALL_QUALITY" -eq 1 ]; then
   QUALITY_SKILLS="h-security-and-hardening h-performance-optimization \
 h-debugging-and-error-recovery h-api-and-interface-design h-frontend-ui-engineering"
-  PROJ_DEST="$PROJECT_DIR/.devin/skills"
+  # Route to the correct skills directory based on the target tool
+  case "$TOOL_NAME" in
+    claude)            PROJ_DEST="$PROJECT_DIR/.claude/skills" ;;
+    cursor|windsurf)   PROJ_DEST="$PROJECT_DIR/.cursor/skills" ;;
+    agents|"")         PROJ_DEST="$PROJECT_DIR/.devin/skills" ;;
+    *)                 PROJ_DEST="$PROJECT_DIR/.devin/skills" ;;
+  esac
   mkdir -p "$PROJ_DEST"
   echo "Installing quality companion skills into $PROJ_DEST"
   for skill in $QUALITY_SKILLS; do
@@ -52,7 +83,7 @@ h-debugging-and-error-recovery h-api-and-interface-design h-frontend-ui-engineer
     cp -R "$src" "$target"
     echo "  installed $skill -> $target"
   done
-  echo "Done. Restart Devin CLI in the project to load them."
+  echo "Done. Restart your AI tool in the project to load them."
 fi
 
 # --tool: write a non-Devin adapter + .sdd/pipeline.md into a target project

@@ -20,18 +20,22 @@ if [ -n "$TOOL_NAME" ] && [ -z "$PROJECT_DIR" ]; then
   exit 1
 fi
 SRC="$(cd "$(dirname "$0")" && pwd)"
-DEST="$HOME/.config/devin/skills"
-mkdir -p "$DEST"
-for d in "$SRC"/h-*; do
-  [ -d "$d" ] || continue
-  name="$(basename "$d")"
-  if [ -e "$DEST/$name" ] && [ ! -L "$DEST/$name" ]; then
-    echo "skip $name (your own real skill — left untouched)"; continue
-  fi
-  ln -sfn "$d" "$DEST/$name"
-  echo "linked $name"
-done
-echo "Done. Restart Devin CLI or re-scan skills if needed."
+
+# Global Devin install — only when no --project or --tool flag given
+if [ -z "$PROJECT_DIR" ] && [ -z "$TOOL_NAME" ]; then
+  DEST="$HOME/.config/devin/skills"
+  mkdir -p "$DEST"
+  for d in "$SRC"/h-*; do
+    [ -d "$d" ] || continue
+    name="$(basename "$d")"
+    if [ -e "$DEST/$name" ] && [ ! -L "$DEST/$name" ]; then
+      echo "skip $name (your own real skill — left untouched)"; continue
+    fi
+    ln -sfn "$d" "$DEST/$name"
+    echo "linked $name"
+  done
+  echo "Done. Restart Devin CLI or re-scan skills if needed."
+fi
 
 # --project: copy quality companion skills into a target project's .devin/skills/
 if [ -n "$PROJECT_DIR" ]; then

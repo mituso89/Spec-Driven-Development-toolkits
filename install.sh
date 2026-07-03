@@ -9,11 +9,11 @@
 #     → Copy quality companion skills into <path>/.devin/skills/
 #
 #   bash install.sh --tool <name> --project <path>
-#     → Write SDD pipeline adapter for a non-Devin tool into <path>
+#     → Write SDD pipeline adapter + copy ALL m-* skills into <path>
 #       Supported tools: claude, cursor, windsurf, agents
 #
 #   bash install.sh --tool <name> --quality --project <path>
-#     → Both adapter and quality skills
+#     → Adapter + quality companion skills only (subset of all skills)
 #
 # NEVER clobbers existing skills or adapter files you already have.
 set -euo pipefail
@@ -84,6 +84,28 @@ m-debugging-and-error-recovery m-api-and-interface-design m-frontend-ui-engineer
     echo "  installed $skill -> $target"
   done
   echo "Done. Restart your AI tool in the project to load them."
+fi
+
+# --tool without --quality: copy ALL m-* skills into the project's skills dir
+if [ -n "$TOOL_NAME" ] && [ "$INSTALL_QUALITY" -eq 0 ]; then
+  case "$TOOL_NAME" in
+    claude)            ALL_SKILLS_DEST="$PROJECT_DIR/.claude/skills" ;;
+    cursor|windsurf)   ALL_SKILLS_DEST="$PROJECT_DIR/.cursor/skills" ;;
+    agents|*)          ALL_SKILLS_DEST="$PROJECT_DIR/.devin/skills" ;;
+  esac
+  mkdir -p "$ALL_SKILLS_DEST"
+  echo "Installing all skills into $ALL_SKILLS_DEST"
+  for d in "$SRC"/m-*; do
+    [ -d "$d" ] || continue
+    name="$(basename "$d")"
+    target="$ALL_SKILLS_DEST/$name"
+    if [ -e "$target" ]; then
+      echo "  skip $name (already exists — left untouched)"; continue
+    fi
+    cp -R "$d" "$target"
+    echo "  installed $name"
+  done
+  echo "Done."
 fi
 
 # --tool: write a non-Devin adapter + .sdd/pipeline.md into a target project

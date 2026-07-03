@@ -5,7 +5,7 @@ Use this template when dispatching a spec compliance reviewer subagent.
 **Purpose:** Verify implementer built what was requested (nothing more, nothing less)
 
 ```
-run_subagent (profile: subagent_general):
+Dispatch a fresh general-purpose subagent using your platform's subagent tool:
   description: "Review spec compliance for Task N"
   prompt: |
     You are reviewing whether an implementation matches its specification.
@@ -20,8 +20,9 @@ run_subagent (profile: subagent_general):
 
     ## CRITICAL: Do Not Trust the Report
 
-    The implementer finished suspiciously quickly. Their report may be incomplete,
-    inaccurate, or optimistic. You MUST verify everything independently.
+    Treat the implementer's report as unverified claims — verify against the
+    actual code. The report may be incomplete, inaccurate, or optimistic.
+    You MUST verify everything independently.
 
     **DO NOT:**
     - Take their word for what they implemented

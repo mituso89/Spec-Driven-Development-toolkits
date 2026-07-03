@@ -7,7 +7,7 @@ Use this template when dispatching a code quality reviewer subagent.
 **Only dispatch after spec compliance review passes.**
 
 ```
-run_subagent (profile: subagent_general):
+Dispatch a fresh general-purpose subagent using your platform's subagent tool:
   Use template at m-requesting-code-review/code-reviewer.md
 
   DESCRIPTION: [task summary, from implementer's report]

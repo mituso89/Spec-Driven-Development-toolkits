@@ -5,20 +5,20 @@ description: "SDD knowledge base — build .sdd/knowledge.md, a project-level in
 
 # SDD — Knowledge Base
 
-> **TL;DR** — Draft `.sdd/knowledge.md` from repo discovery + context7 **and generate the `.sdd/repo-map.md` structural layer** (1) → user curates & write, recording the structural-grounding source (2) → route to specify (3). Read `~/.config/devin/skills/m-sdd/_shared.md` first.
+> **TL;DR** — Draft `.sdd/knowledge.md` from repo discovery + context7 **and generate the `.sdd/repo-map.md` structural layer** (1) → user curates & write, recording the structural-grounding source (2) → route to specify (3). Read `<skills-root>/m-sdd/_shared.md` first.
 
 Project-level facts/pointers, sibling to `constitution.md`. **knowledge.md = what is *true* (facts); constitution.md = what you *must do* (rules).** Optional and intentionally **not** a tracked pipeline phase — `specify`/`clarify` read it when present.
 
 ## Phase 0 — Preflight
-- Read `~/.config/devin/skills/m-sdd/_shared.md`.
-- `source ~/.config/devin/skills/m-sdd/sdd-lib.sh; root="$(pwd)"`; ensure scaffold: `sdd_scaffold "$root"` (copies `knowledge-template.md` into `.sdd/templates/`).
+- Read `<skills-root>/m-sdd/_shared.md`.
+- `source <skills-root>/m-sdd/sdd-lib.sh; root="$(pwd)"`; ensure scaffold: `sdd_scaffold "$root"` (copies `knowledge-template.md` into `.sdd/templates/`).
 - No hard gate — knowledge is project-level and optional. If `.sdd/constitution.md` is absent, suggest `m-sdd-constitution` but proceed.
 
 ## Phase 1 — Draft (assisted: discover + context7)
 - **Discover:** scan `CLAUDE.md`/`AGENTS.md`, `ARCHITECTURE.md`, `README`, the manifest (`package.json`/`pyproject.toml`/`go.mod`/…), the folder layout, and the key modules. Extract a one-paragraph **stack profile**, a **pointer map** (link out — do NOT copy), and **candidate glossary terms**.
 - **Structural map (generated):** run the repo-map generator to capture files +
   key symbols across the repo's languages:
-  `bash ~/.config/devin/skills/m-sdd-knowledge/repo-map.sh "$root"` → writes
+  `bash <skills-root>/m-sdd-knowledge/repo-map.sh "$root"` → writes
   `$root/.sdd/repo-map.md`. This is the rot-proof machine layer; it replaces
   manual file-by-file eyeballing for structural facts. Re-runnable anytime.
 - **Optional code MCP:** if a code-intelligence MCP is available in this session
@@ -34,7 +34,9 @@ Project-level facts/pointers, sibling to `constitution.md`. **knowledge.md = wha
 - Write the result to `$root/.sdd/knowledge.md`.
 - Record a **Structural grounding** line in `knowledge.md` naming the active
   source: `.sdd/repo-map.md` (generated), or the MCP name (`serena` / `codegraph`).
-- Ensure the target repo ignores the generated map (it is a regenerated artifact):
+- Ensure the target repo ignores the generated map (it is a regenerated artifact) —
+  **ask the user first** (or at minimum announce it before doing it; never touch
+  `.gitignore` silently):
   `grep -qxF '.sdd/repo-map.md' "$root/.gitignore" 2>/dev/null || printf '.sdd/repo-map.md\n' >> "$root/.gitignore"`
 
 ## Phase 3 — Route

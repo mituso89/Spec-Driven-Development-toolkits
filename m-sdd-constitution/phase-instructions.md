@@ -4,7 +4,7 @@
 
 **Pipeline:** → constitution → specify
 
-The constitution is project-level (one per project, not per feature). It gates all downstream phases. Read by every phase; enforced by the analyze phase.
+The constitution is project-level (one per project, not per feature). It is advisory context, not an enforced gate: read by every phase; checked by the analyze phase.
 
 ## Preflight
 
@@ -24,7 +24,7 @@ The constitution is project-level (one per project, not per feature). It gates a
 
 - Save the filled document to `.sdd/constitution.md`.
 - Show the user the result and get explicit approval (this is a gate).
-- Update `.sdd/pipeline.md`: set `constitution` row to `approved`.
+- Update `.sdd/pipeline.md`: set `constitution` row to `done` (`approved` is reserved for spec/plan).
 
 ## Phase 3 — Route
 

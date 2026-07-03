@@ -5,15 +5,15 @@ description: "SDD phase 6 (optional gate) — cross-check constitution, spec, pl
 
 # SDD — Analyze
 
-> **TL;DR** — Gate on completed tasks (0) → cross-check the four artifacts against each other and the constitution (1) → write `analysis.md`, mark done or block, route (2). Read `~/.config/devin/skills/m-sdd/_shared.md` first.
+> **TL;DR** — Gate on completed tasks (0) → cross-check the four artifacts against each other and the constitution (1) → write `analysis.md`, mark done or block, route (2). Read `<skills-root>/m-sdd/_shared.md` first.
 
-**Pipeline:** tasks → **analyze** → implement. Optional but recommended.
+**Pipeline:** tasks → **analyze** → implement. A skippable gate, not optional decoration: `m-sdd-implement` refuses to start until analyze is `done` or explicitly `skipped` (`sdd_set_phase … analyze skipped`).
 
 ## Phase 0 — Preflight & gate
 - Read `_shared.md`; load `.sdd/constitution.md`.
-- `source ~/.config/devin/skills/m-sdd/sdd-lib.sh; root="$(pwd)"; id="$(sdd_active_feature "$root")"`
+- `source <skills-root>/m-sdd/sdd-lib.sh; root="$(pwd)"; id="$(sdd_active_feature "$root")"`
 - `sdd_require "$root" "$id" tasks "done"`.
-- Borrow the rigor of `m-requesting-code-review` for the cross-checks below; this phase does not delegate.
+- Review discipline for the cross-checks below (this phase does not delegate): verify every claim against the actual artifact files, never a summary or your memory of them; report each finding with artifact + location (section/line) + severity; classify each finding `blocking` or `non-blocking` with a one-line rationale.
 
 ## Phase 1 — Cross-artifact analysis
 - `sdd_set_phase "$root" "$id" analyze in_progress`

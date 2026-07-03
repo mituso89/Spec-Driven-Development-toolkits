@@ -14,7 +14,7 @@ This is the entry point. Phase skills (`m-sdd-constitution` … `m-sdd-tasks-to-
 - Require `jq`: `command -v jq >/dev/null || echo "MISSING jq"` — if it prints
   `MISSING jq`, **STOP**: tell the user to install it (`brew install jq`) and do
   not run any `sdd_*` function until it is present.
-- `source ~/.config/devin/skills/m-sdd/sdd-lib.sh; root="$(pwd)"`
+- `source <skills-root>/m-sdd/sdd-lib.sh; root="$(pwd)"` (`<skills-root>` is defined in `_shared.md`)
 
 ## Phase 1 — Scaffold (idempotent)
 - `sdd_scaffold "$root"` — creates `.sdd/{config.json,state.json,templates/}` and `specs/`.
@@ -36,4 +36,5 @@ First show what exists: `sdd_list "$root"` (one line per feature, `* ` marks act
 
 ## Notes
 - Never hand-edit `state.json`; always go through `sdd-lib.sh`.
-- Pipeline order: constitution → specify → clarify → plan → tasks → analyze → implement → issues.
+- Pipeline order lives in one place: `sdd_phases` in `sdd-lib.sh` (surfaced via `sdd_status`/`sdd_get_next`) — don't duplicate it.
+- `phase-instructions.md` files in the skill folders are install-time input for non-Devin adapters (consumed by `install.sh`), not runtime reading.

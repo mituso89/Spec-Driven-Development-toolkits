@@ -47,38 +47,17 @@ Save `screen_dir` and `state_dir` from the response. Tell user to open the URL.
 
 **Note:** Pass the project root as `--project-dir` so mockups persist in `.sdd/brainstorm/` and survive server restarts. Without it, files go to `/tmp` and get cleaned up. Remind the user to add `.sdd/brainstorm/` to `.gitignore` if it's not already there.
 
-**Launching the server by platform:**
+**Launching the server:**
 
-**Devin CLI (macOS / Linux):**
+Use your shell/exec tool to launch the script, running it in the background so the server survives across conversation turns:
+
 ```bash
-# Default mode works — the script backgrounds the server itself
 scripts/start-server.sh --project-dir /path/to/project
 ```
 
-**Devin CLI (Windows):**
-```bash
-# Windows auto-detects and uses foreground mode, which blocks the tool call.
-# Use run_in_background: true on the exec tool call so the server survives
-# across conversation turns.
-scripts/start-server.sh --project-dir /path/to/project
-```
-When calling this via the exec tool, set `run_in_background: true`. Then read `$STATE_DIR/server-info` on the next turn to get the URL and port.
-
-**Codex:**
-```bash
-# Codex reaps background processes. The script auto-detects CODEX_CI and
-# switches to foreground mode. Run it normally — no extra flags needed.
-scripts/start-server.sh --project-dir /path/to/project
-```
-
-**Gemini CLI:**
-```bash
-# Use --foreground and set is_background: true on your shell tool call
-# so the process survives across turns
-scripts/start-server.sh --project-dir /path/to/project --foreground
-```
-
-**Other environments:** The server must keep running in the background across conversation turns. If your environment reaps detached processes, use `--foreground` and launch the command with your platform's background execution mechanism.
+- On macOS/Linux, default mode usually works — the script backgrounds the server itself. If the tool call didn't capture stdout, read `$STATE_DIR/server-info` on the next turn to get the URL and port.
+- On Windows, the script auto-detects and uses foreground mode, which blocks the tool call. Run it with your shell tool's background-execution option, then read `$STATE_DIR/server-info` on the next turn.
+- Some environments reap detached processes (the script auto-detects known cases and switches to foreground mode). If yours does, pass `--foreground` and launch the command with your shell tool's background-execution option so the process survives across turns.
 
 If the URL is unreachable from your browser (common in remote/containerized setups), bind a non-loopback host:
 

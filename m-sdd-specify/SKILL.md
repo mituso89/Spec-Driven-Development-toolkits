@@ -5,7 +5,7 @@ description: "SDD phase 2 — turn a feature idea into an approved REQUIREMENT s
 
 # SDD — Specify
 
-> **TL;DR** — Preflight + ensure a feature exists (0) → run a **convergent requirement-capture interview** under the **requirement-first contract** below, filling `specs/<id>/spec.md` (1) → self-validate with a requirements checklist, ≤3 iterations (1.5) → resolve ≤3 `[NEEDS CLARIFICATION]` markers as sequential questions, get approval & mark `specify approved` (2). Read `~/.config/devin/skills/m-sdd/_shared.md` first.
+> **TL;DR** — Preflight + ensure a feature exists (0) → run a **convergent requirement-capture interview** under the **requirement-first contract** below, filling `specs/<id>/spec.md` (1) → self-validate with a requirements checklist, ≤3 iterations (1.5) → resolve ≤3 `[NEEDS CLARIFICATION]` markers as sequential questions, get approval & mark `specify approved` (2). Read `<skills-root>/m-sdd/_shared.md` first.
 
 **Pipeline:** constitution → **specify** → clarify.
 
@@ -39,7 +39,7 @@ describes **WHAT users need and WHY** — never HOW.
 ## Phase 0 — Preflight
 - Read `_shared.md`; load constitution (`.sdd/constitution.md`). If absent, warn and offer `m-sdd-constitution`.
 - Load `.sdd/knowledge.md` if present (project facts/glossary/pointers) to ground the spec; if absent, note it and suggest `m-sdd-knowledge` (non-blocking).
-- `source ~/.config/devin/skills/m-sdd/sdd-lib.sh; root="$(pwd)"; sdd_scaffold "$root"` (idempotent — makes cold-starting here on a fresh repo safe), then `id="$(sdd_active_feature "$root")"`.
+- `source <skills-root>/m-sdd/sdd-lib.sh; root="$(pwd)"; sdd_scaffold "$root"` (idempotent — makes cold-starting here on a fresh repo safe), then `id="$(sdd_active_feature "$root")"`.
 - If `id` is empty: ask the feature name, then `id="$(sdd_create_feature "$root" "<name>")"`.
 
 ## Phase 1 — Requirement-capture interview (self-contained)
@@ -67,8 +67,9 @@ describes **WHAT users need and WHY** — never HOW.
 ## Phase 1.5 — Self-validate (requirements checklist)
 Before showing the spec for approval, test its *wording* (spec-kit parity:
 auto `checklists/requirements.md`):
-- Generate `specs/$id/checklists/requirements.md` following **m-sdd-checklist
-  Phase 2 rules** (domain = `requirements`; CHK### items; ≥80% cite `§` or carry
+- Generate `specs/$id/checklists/requirements.md`: read
+  `<skills-root>/m-sdd-checklist/SKILL.md` Phase 2 and apply its rules
+  (domain = `requirements`; CHK### items; ≥80% cite `§` or carry
   `[Gap]`/`[Ambiguity]`/`[Conflict]`/`[Assumption]`): no banned implementation
   detail, every story has acceptance scenarios, requirements testable, success
   criteria measurable, edge cases present, ≤3 clarification markers.
@@ -77,7 +78,7 @@ auto `checklists/requirements.md`):
 
 ## Phase 2 — Clarify markers, approve & route
 - If the spec carries `[NEEDS CLARIFICATION]` markers, present them **one at a
-  time as sequential questions** (use `m-ask` patterns); replace each marker
+  time as sequential questions**; replace each marker
   with the answer. Max 3 — if more emerged, downgrade the least scope-critical
   to Assumptions. Before approval, verify none survive (not even in comments):
   `grep -c 'NEEDS CLARIFICATION' "specs/$id/spec.md"` must print 0.

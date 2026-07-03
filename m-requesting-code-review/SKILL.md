@@ -1,6 +1,6 @@
 ---
 name: m-requesting-code-review
-description: Use when completing tasks, implementing major features, or before merging to verify work meets requirements
+description: "Dispatches a fresh-context reviewer subagent against a git commit range and triages its findings by severity. Use after completing a task or feature, or before merging. Triggers: review my changes, code review, pre-merge check."
 ---
 
 # Requesting Code Review
@@ -29,9 +29,11 @@ BASE_SHA=$(git rev-parse HEAD~1)  # or origin/main
 HEAD_SHA=$(git rev-parse HEAD)
 ```
 
+**Note:** with uncommitted changes, commit first (or have the reviewer look at `git diff` directly) — the SHA-range approach misses unstaged work.
+
 **2. Dispatch code reviewer subagent:**
 
-Use the run_subagent tool with the `subagent_general` profile, fill template at `code-reviewer.md`
+Dispatch a fresh general-purpose subagent using your platform's subagent tool, fill template at `code-reviewer.md`
 
 **Placeholders:**
 - `{DESCRIPTION}` - Brief summary of what you built
@@ -52,7 +54,7 @@ Use the run_subagent tool with the `subagent_general` profile, fill template at 
 
 You: Let me request code review before proceeding.
 
-BASE_SHA=$(git log --oneline | grep "Task 1" | head -1 | awk '{print $1}')
+BASE_SHA=$(git rev-parse HEAD~1)  # the commit that ended Task 1
 HEAD_SHA=$(git rev-parse HEAD)
 
 [Dispatch code reviewer subagent]

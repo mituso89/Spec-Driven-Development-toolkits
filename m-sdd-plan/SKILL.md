@@ -5,19 +5,19 @@ description: "SDD phase 4 — produce the technical implementation plan by deleg
 
 # SDD — Plan
 
-> **TL;DR** — Gate on an approved spec (0) → delegate to **m-writing-plans**, redirecting output to `specs/<id>/plan.md` (1) → add companion artifacts, **get human approval & mark `approved`**, route (2). Read `~/.config/devin/skills/m-sdd/_shared.md` first.
+> **TL;DR** — Gate on an approved spec (0) → delegate to **m-writing-plans**, redirecting output to `specs/<id>/plan.md` (1) → add companion artifacts, **get human approval & mark `approved`**, route (2). Read `<skills-root>/m-sdd/_shared.md` first.
 
 **Pipeline:** clarify → **plan** → tasks.
 
 ## Phase 0 — Preflight & gate
 - Read `_shared.md`; load constitution (the plan's tech choices must respect it).
 - Load the **structural grounding** if present: read `.sdd/knowledge.md`'s `Structural grounding` line → load `.sdd/repo-map.md` (generated), or use the named code MCP (`serena`/`codegraph`). This is the structural half of grounding (knowledge.md = curated facts); use it in Phase 1.
-- `source ~/.config/devin/skills/m-sdd/sdd-lib.sh; root="$(pwd)"; id="$(sdd_active_feature "$root")"`
+- `source <skills-root>/m-sdd/sdd-lib.sh; root="$(pwd)"; id="$(sdd_active_feature "$root")"`
 - `sdd_require "$root" "$id" specify "approved"` — no plan without an approved spec.
 
 ## Phase 1 — Delegate to m-writing-plans
 - `sdd_set_phase "$root" "$id" plan in_progress`
-- Invoke **m-writing-plans** with two overrides:
+- Invoke **m-writing-plans** with four overrides. Mechanism: include the overrides below verbatim in the context you give m-writing-plans — it cannot honor rules it never sees.
   1. Read the spec from `specs/$id/spec.md`; write the plan to `specs/$id/plan.md` (start from `.sdd/templates/plan-template.md`), NOT to `docs/plans/`. The spec is requirements-only (no HOW) — all tech decisions are made *here*; honor any technology preferences the spec parked under **Assumptions**. If `specs/$id/design/` exists, read `design/README.md` + its screens as the **visual implementation reference** — derive components, layouts, and states from the mockups (they are read-only; do not edit them).
   2. **Do NOT offer the execution handoff** at the end — implementation is the separate `m-sdd-implement` phase. Return control here.
   3. **Fill the `## Testing Strategy` section** of the plan: map every user story and **success criterion (SC-###)** from the spec to how it will be verified, choose test levels, and state how to run tests. Whether coverage is *mandatory* or merely *expected* follows the constitution's testing principle (default: expected, not blocking, if none is defined). Keep the spec unchanged — strategy lives here, the acceptance contract stays in the spec.
@@ -29,4 +29,4 @@ description: "SDD phase 4 — produce the technical implementation plan by deleg
 - If the user requests changes, revise and re-present; leave the phase `in_progress` (do NOT mark `approved`). Never advance to tasks/implement on an unapproved plan.
 - Route to `m-sdd-tasks`.
 
-> Optional companions: if the spec involves an API or module boundary, run `m-api-and-interface-design` while drafting the plan. If the spec involves user-facing UI, run `m-frontend-ui-engineering`. Neither blocks the approval gate.
+> Optional companions: if the spec involves an API or module boundary, run `m-api-and-interface-design` while drafting the plan — its output lands in the plan's Contracts section and/or `specs/$id/contracts/`. If the spec involves user-facing UI, run `m-frontend-ui-engineering` — its guidance lands in the plan's design notes. Neither blocks the approval gate.

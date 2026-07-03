@@ -1,15 +1,15 @@
 ---
 name: m-writing-plans
-description: Use when you have a spec or requirements for a multi-step task, before touching code
+description: "Writes a detailed implementation plan — bite-sized TDD tasks with exact file paths, code, and verification commands — from an approved spec or requirements. Use for any multi-step task, before touching code. Triggers: write a plan, implementation plan, plan this feature, break this down."
 ---
 
 # Writing Plans
 
 ## Overview
 
-Write comprehensive implementation plans assuming the engineer has zero context for our codebase and questionable taste. Document everything they need to know: which files to touch for each task, code, testing, docs they might need to check, how to test it. Give them the whole plan as bite-sized tasks. DRY. YAGNI. TDD. Frequent commits.
+Write comprehensive implementation plans assuming the engineer has zero context for the codebase and questionable taste. Document everything they need to know: which files to touch for each task, code, testing, docs they might need to check, how to test it. Give them the whole plan as bite-sized tasks. DRY. YAGNI. TDD. Frequent commits.
 
-Assume they are a skilled developer, but know almost nothing about our toolset or problem domain. Assume they don't know good test design very well.
+Assume they are a skilled developer, but know almost nothing about the project's toolset or problem domain. Assume they don't know good test design very well.
 
 **Announce at start:** "I'm using the m-writing-plans skill to create the implementation plan."
 

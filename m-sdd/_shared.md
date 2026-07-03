@@ -2,6 +2,12 @@
 
 Every `m-sdd-*` skill reads this first. Three rules are identical across all phases.
 
+**Path convention:** `<skills-root>` = the directory this skill was loaded from — the
+parent folder containing all `m-*` skill folders. For a global Devin install that is
+`~/.config/devin/skills`; for a project install it is `<project>/.devin/skills`,
+`<project>/.claude/skills`, or wherever the skills were copied. Resolve it once and
+substitute it in every `<skills-root>/…` path below and in the phase skills.
+
 ## Rule 1 — Delegate, don't hand-roll
 Where a phase names a delegate skill (plan→`m-writing-plans`,
 implement→`m-subagent-driven-development`, tasks-to-issues→`m-story-breakdown`,
@@ -57,7 +63,7 @@ autonomously — if unsure whether the human approved, treat it as not approved.
 ## Library usage (deterministic state — never hand-edit state.json)
 Source the helper library, then use its functions:
 ```bash
-source ~/.config/devin/skills/m-sdd/sdd-lib.sh
+source <skills-root>/m-sdd/sdd-lib.sh
 root="$(pwd)"
 id="$(sdd_active_feature "$root")"          # "" if none
 sdd_list "$root"                            # all features, "* " marks active

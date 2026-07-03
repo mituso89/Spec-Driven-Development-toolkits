@@ -36,7 +36,7 @@ If nothing is staged, stage explicitly (`git add <path>`) — never `git add -A`
 | `ci` | CI pipelines |
 | `style` | Formatting only |
 
-Scope = the package, module, or area touched (lowercase, no scope prefix). Use a path-like scope for a sub-area:
+Scope = the package, module, or area touched (lowercase, no scope prefix). Use a path-like scope for a sub-area. **Illustrative example only** — these are not this repo's scopes:
 
 | Scope | Meaning |
 |---|---|
@@ -46,7 +46,7 @@ Scope = the package, module, or area touched (lowercase, no scope prefix). Use a
 | `web/dashboard` | a route or feature inside the app |
 | `repo` | root configs / workspace plumbing |
 
-Adapt scopes to the repo's actual package/module names — read them from the workspace manifest if unsure.
+Derive the real scopes from the repo itself: check `git log --oneline -30` for the scopes already in use, and read the package/module names from the workspace manifest (e.g. `package.json` workspaces, `Cargo.toml` members).
 
 ---
 
@@ -112,7 +112,22 @@ EOF
 )"
 ```
 
-If the `commit-msg` hook rejects: read the hook output, fix the offending part (type, scope, length, missing body for breaking change), and create a **new** commit — never `--amend` after a hook failure unless explicitly asked.
+If the `commit-msg` hook rejects: no commit was created — the hook aborted it. Read the hook output, fix the offending part (type, scope, length, missing body for breaking change), and retry `git commit` with the corrected message. Never `--amend` here — there is nothing to amend; it would rewrite the previous, unrelated commit.
+
+If the repo has no `commit-msg` hook: the format above still applies — just skip the hook-verification step.
+
+---
+
+## Fixup & squash
+
+To fold a correction into an earlier commit on the branch:
+
+```bash
+git commit --fixup=<sha>          # marks the commit as a fixup of <sha>
+git rebase --autosquash <base>    # squashes fixups into place
+```
+
+Note: `--autosquash` runs an interactive rebase under the hood — it may need harness support (a non-interactive environment can use `GIT_SEQUENCE_EDITOR=true`). Never rebase commits that are already pushed and shared.
 
 ---
 

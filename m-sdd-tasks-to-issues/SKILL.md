@@ -5,13 +5,13 @@ description: "SDD phase 8 (optional) — push the feature's tasks.md to Jira as 
 
 # SDD — Tasks → Issues
 
-> **TL;DR** — Gate on tasks ready (0) → delegate to **m-story-breakdown** to create linked Jira tickets from `tasks.md` (1) → mark done/skipped (2). Read `~/.config/devin/skills/m-sdd/_shared.md` first.
+> **TL;DR** — Gate on tasks ready (0) → delegate to **m-story-breakdown** to create linked Jira tickets from `tasks.md` (1) → mark done/skipped (2). Read `<skills-root>/m-sdd/_shared.md` first.
 
-**Pipeline:** implement → **issues** (terminal, optional).
+**Pipeline:** **issues** (terminal, optional) — runs any time after tasks (typically after implement).
 
 ## Phase 0 — Preflight & gate
 - Read `_shared.md`.
-- `source ~/.config/devin/skills/m-sdd/sdd-lib.sh; root="$(pwd)"; id="$(sdd_active_feature "$root")"`
+- `source <skills-root>/m-sdd/sdd-lib.sh; root="$(pwd)"; id="$(sdd_active_feature "$root")"`
 - `sdd_require "$root" "$id" tasks "done"`. **By design this gates on tasks, not
   implement:** teams that plan in Jira may push tickets before (or instead of)
   building. Implement's status is irrelevant here.
@@ -24,3 +24,4 @@ description: "SDD phase 8 (optional) — push the feature's tasks.md to Jira as 
 
 ## Phase 2 — Record
 - On success: `sdd_set_phase "$root" "$id" issues done` and report the created ticket URLs.
+- On partial ticket creation (some creates failed): report the issue keys that WERE created, leave the phase `in_progress`, and tell the user to re-run this skill (feeding it the already-created keys so nothing is duplicated).

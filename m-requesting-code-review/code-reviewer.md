@@ -4,8 +4,10 @@ Use this template when dispatching a code reviewer subagent.
 
 **Purpose:** Review completed work against requirements and code quality standards before it cascades into more work.
 
+Dispatch a fresh general-purpose subagent using your platform's subagent tool:
+
 ```
-run_subagent (profile: subagent_general):
+subagent:
   description: "Review code changes"
   prompt: |
     You are a Senior Code Reviewer with expertise in software architecture,

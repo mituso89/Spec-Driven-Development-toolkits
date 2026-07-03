@@ -3,7 +3,7 @@
 Use this template when dispatching an implementer subagent.
 
 ```
-run_subagent (profile: subagent_general):
+Dispatch a fresh general-purpose subagent using your platform's subagent tool:
   description: "Implement Task N: [task name]"
   prompt: |
     You are implementing Task N: [task name]

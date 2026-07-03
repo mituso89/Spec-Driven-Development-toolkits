@@ -1,6 +1,6 @@
 ---
 name: m-subagent-driven-development
-description: Use when executing implementation plans with independent tasks in the current session
+description: "Executes an implementation plan by dispatching a fresh subagent per task, with two-stage review (spec compliance, then code quality) after each task. Use when a written plan with mostly independent tasks exists and subagents are available. Triggers: execute plan with subagents, subagent driven, dispatch tasks."
 ---
 
 # Subagent-Driven Development
@@ -11,7 +11,7 @@ Execute plan by dispatching fresh subagent per task, with two-stage review after
 
 **Core principle:** Fresh subagent per task + two-stage review (spec then quality) = high quality, fast iteration
 
-**Continuous execution:** Do not pause to check in with your human partner between tasks. Execute all tasks from the plan without stopping. The only reasons to stop are: BLOCKED status you cannot resolve, ambiguity that genuinely prevents progress, or all tasks complete. "Should I continue?" prompts and progress summaries waste their time — they asked you to execute the plan, so execute it.
+**Continuous execution:** Do not pause to check in with the user between tasks. Execute all tasks from the plan without stopping. The only reasons to stop are: BLOCKED status you cannot resolve, ambiguity that genuinely prevents progress, or all tasks complete. "Should I continue?" prompts and progress summaries waste their time — they asked you to execute the plan, so execute it.
 
 ## When to Use
 
@@ -57,15 +57,15 @@ digraph process {
         "Dispatch code quality reviewer subagent (./code-quality-reviewer-prompt.md)" [shape=box];
         "Code quality reviewer subagent approves?" [shape=diamond];
         "Implementer subagent fixes quality issues" [shape=box];
-        "Mark task complete in todo_write" [shape=box];
+        "Mark task complete in your todo list" [shape=box];
     }
 
-    "Read plan, extract all tasks with full text, note context, create todo_write" [shape=box];
+    "Read plan, extract all tasks with full text, note context, create your todo list" [shape=box];
     "More tasks remain?" [shape=diamond];
     "Dispatch final code reviewer subagent for entire implementation" [shape=box];
     "Use m-finishing-a-development-branch" [shape=box style=filled fillcolor=lightgreen];
 
-    "Read plan, extract all tasks with full text, note context, create todo_write" -> "Dispatch implementer subagent (./implementer-prompt.md)";
+    "Read plan, extract all tasks with full text, note context, create your todo list" -> "Dispatch implementer subagent (./implementer-prompt.md)";
     "Dispatch implementer subagent (./implementer-prompt.md)" -> "Implementer subagent asks questions?";
     "Implementer subagent asks questions?" -> "Answer questions, provide context" [label="yes"];
     "Answer questions, provide context" -> "Dispatch implementer subagent (./implementer-prompt.md)";
@@ -78,8 +78,8 @@ digraph process {
     "Dispatch code quality reviewer subagent (./code-quality-reviewer-prompt.md)" -> "Code quality reviewer subagent approves?";
     "Code quality reviewer subagent approves?" -> "Implementer subagent fixes quality issues" [label="no"];
     "Implementer subagent fixes quality issues" -> "Dispatch code quality reviewer subagent (./code-quality-reviewer-prompt.md)" [label="re-review"];
-    "Code quality reviewer subagent approves?" -> "Mark task complete in todo_write" [label="yes"];
-    "Mark task complete in todo_write" -> "More tasks remain?";
+    "Code quality reviewer subagent approves?" -> "Mark task complete in your todo list" [label="yes"];
+    "Mark task complete in your todo list" -> "More tasks remain?";
     "More tasks remain?" -> "Dispatch implementer subagent (./implementer-prompt.md)" [label="yes"];
     "More tasks remain?" -> "Dispatch final code reviewer subagent for entire implementation" [label="no"];
     "Dispatch final code reviewer subagent for entire implementation" -> "Use m-finishing-a-development-branch";
@@ -115,7 +115,7 @@ Implementer subagents report one of four statuses. Handle each appropriately:
 1. If it's a context problem, provide more context and re-dispatch with the same model
 2. If the task requires more reasoning, re-dispatch with a more capable model
 3. If the task is too large, break it into smaller pieces
-4. If the plan itself is wrong, escalate to the human
+4. If the plan itself is wrong, escalate to the user
 
 **Never** ignore an escalation or force the same model to retry without changes. If the implementer said it's stuck, something needs to change.
 
@@ -132,7 +132,7 @@ You: I'm using Subagent-Driven Development to execute this plan.
 
 [Read plan file once: docs/plans/feature-plan.md]
 [Extract all 5 tasks with full text and context]
-[Create todo_write with all tasks]
+[Create your todo list with all tasks]
 
 Task 1: Hook installation script
 
@@ -200,38 +200,6 @@ Final reviewer: All requirements met, ready to merge
 
 Done!
 ```
-
-## Advantages
-
-**vs. Manual execution:**
-- Subagents follow TDD naturally
-- Fresh context per task (no confusion)
-- Parallel-safe (subagents don't interfere)
-- Subagent can ask questions (before AND during work)
-
-**vs. Executing Plans:**
-- Same session (no handoff)
-- Continuous progress (no waiting)
-- Review checkpoints automatic
-
-**Efficiency gains:**
-- No file reading overhead (controller provides full text)
-- Controller curates exactly what context is needed
-- Subagent gets complete information upfront
-- Questions surfaced before work begins (not after)
-
-**Quality gates:**
-- Self-review catches issues before handoff
-- Two-stage review: spec compliance, then code quality
-- Review loops ensure fixes actually work
-- Spec compliance prevents over/under-building
-- Code quality ensures implementation is well-built
-
-**Cost:**
-- More subagent invocations (implementer + 2 reviewers per task)
-- Controller does more prep work (extracting all tasks upfront)
-- Review loops add iterations
-- But catches issues early (cheaper than debugging later)
 
 ## Red Flags
 

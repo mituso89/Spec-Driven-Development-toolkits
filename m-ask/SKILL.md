@@ -1,6 +1,6 @@
 ---
 name: m-ask
-description: "Project-grounded advisor: answer any question, brainstorm, compare approaches, or recommend strategy grounded in THIS codebase and its own conventions — not generic advice. Triggers: how do I, what is, should I, why does, explain, brainstorm, compare, best way, recommend, advice, strategy, which approach, what's the difference, help me think, can I, is it possible, design first, shape this, sketch a design, how should I structure, design the X before building."
+description: "Project-grounded advisor: answer any question, brainstorm, compare approaches, or recommend strategy grounded in THIS codebase and its own conventions — not generic advice. Triggers: how do I, what is, should I, why does, explain, brainstorm, compare, best way, recommend, advice, strategy, which approach, what's the difference, help me think, can I, is it possible, design first, shape this, sketch a design, how should I structure, design the X before building. For quick inline design shaping; for a full committed spec and design gate, use m-brainstorming instead."
 ---
 
 # Ask Advisor
@@ -22,9 +22,9 @@ Generic advice without project context is worse than no advice. Every claim abou
 | **Brainstorm** | "Help me think through X" | Options → implementation-ready output |
 | **Design-first** | "Help me design / shape / structure X before I build it" | Lightweight inline design (Phase 3 → Design shape) |
 | **Explain** | "Explain how X works" | Grounded walkthrough with `file:line` |
-| **Why broken** | "Why is X broken" | → a debugging skill / `engineering:debug` |
-| **Implement** | "Build / add X" | → an implementation skill |
-| **Review** | "Is this ready" | → a review skill / `/code-review` |
+| **Why broken** | "Why is X broken" | → `m-debugging-and-error-recovery` |
+| **Implement** | "Build / add X" | → `m-writing-plans` → `m-subagent-driven-development` |
+| **Review** | "Is this ready" | → `m-requesting-code-review` |
 
 For implement/debug/review intents, hand off to the project's matching skill if one exists; otherwise proceed but say you're answering directly.
 
@@ -37,7 +37,7 @@ For implement/debug/review intents, hand off to the project's matching skill if 
 Do NOT assume a stack. Read what this project actually locks, in this order, stopping when you have enough:
 
 1. `CLAUDE.md` / `AGENTS.md` at the repo root — project instructions and rules.
-2. `.devin/rules/*` or a `CONVENTIONS.md` — explicit do/don't lists.
+2. The project's agent rules/config (e.g. `.devin/rules`, `.claude/`, `AGENTS.md`) or a `CONVENTIONS.md` — explicit do/don't lists.
 3. `package.json` / `pyproject.toml` / `go.mod` / `Cargo.toml` — the real dependencies and scripts.
 4. The folder layout — where code of each kind lives.
 
@@ -115,7 +115,7 @@ Used in:   [file:line]
 
 ## Phase 4 — Route
 
-End with one concrete next step: an implementation skill, a debug skill, a review skill/`/code-review`, or "Done — no further action."
+End with one concrete next step: implementation (`m-writing-plans` → `m-subagent-driven-development`), debugging (`m-debugging-and-error-recovery`), review (`m-requesting-code-review`), or "Done — no further action."
 
 ---
 

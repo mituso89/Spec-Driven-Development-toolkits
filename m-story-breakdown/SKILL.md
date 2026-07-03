@@ -9,9 +9,9 @@ description: "Jira story/epic orchestrator — create the parent story or epic i
 
 Follow every phase in order. **Do NOT create any Jira issue until its user gate has passed** (Phase 1 gate for the parent, Phase 4 gate for children).
 
-All Jira work uses the `mcp__mcp-atlassian__*` MCP tools — never a CLI. If a required tool is not loaded, fetch its schema via `ToolSearch` first.
+All Jira work uses the Atlassian MCP's tools (`jira_create_issue`, `jira_get_issue`, …) — never a CLI. Discover the exact prefixed tool names via your tool-search mechanism (server prefixes vary per install); the code blocks below use the bare tool names. If a required tool is not loaded, fetch its schema first.
 
-> **Install location** — portable: works at `<repo>/.devin/skills/m-story-breakdown/` or `~/.config/devin/skills/m-story-breakdown/`. The Atlassian MCP must be reachable; a project `.mcp.json` wins over global MCP config.
+> **Install location** — portable: works from any skills root, project-local or global (`<skills-root>/m-story-breakdown/`, where `<skills-root>` is the directory this skill was loaded from). The Atlassian MCP must be reachable; a project `.mcp.json` wins over global MCP config.
 
 ---
 
@@ -19,12 +19,14 @@ All Jira work uses the `mcp__mcp-atlassian__*` MCP tools — never a CLI. If a r
 
 Resolve config by trying in order, stopping at the first hit (Read each; on error, next):
 
-1. `<cwd>/.devin/skills/m-story-breakdown/config.json` (project override)
-2. `<cwd>/.devin/skills/m-story-breakdown/config.example.json`
-3. `~/.config/devin/skills/m-story-breakdown/config.json` (global default)
+1. `<project skills root>/m-story-breakdown/config.json` (project override)
+2. `<project skills root>/m-story-breakdown/config.example.json`
+3. `<global skills root>/m-story-breakdown/config.json` (global default)
 4. `<skill-dir>/config.example.json` (last resort)
 
-Announce the resolved source once. If only the example was found, tell the user once to copy it to `config.json` and customise. If the Atlassian MCP tools are missing: `Atlassian MCP not loaded — add it to <cwd>/.devin/config.json or ~/.config/devin/config.json` and stop.
+A "skills root" is a directory containing the `m-*` skill folders — project-local (e.g. `<project>/.devin/skills`, `<project>/.claude/skills`) or global (e.g. `~/.config/devin/skills`); `<skill-dir>` is the folder this SKILL.md was loaded from.
+
+Announce the resolved source once. If only the example was found, tell the user once to copy it to `config.json` and customise. If the Atlassian MCP tools are missing: `Atlassian MCP not loaded — add it to your project or global MCP config` and stop.
 
 **Config shape** (see `config.example.json`):
 
@@ -88,7 +90,7 @@ User confirms → Phase 1. Revisions → update the block, wait again.
 
 **Mode A — fetch:**
 ```
-mcp__mcp-atlassian__jira_get_issue(
+jira_get_issue(
   issue_key: "<ISSUE-KEY>",
   fields: "summary,description,status,issuetype,labels,components,priority,assignee,parent",
   comment_limit: 0
@@ -159,13 +161,13 @@ Present the full proposed list in one compact numbered block — **type, stack, 
 
 ## Phase 5 — Create Tickets
 
-`todo_write`: one todo per ticket + one for linking; flip as you go.
+Track one todo per ticket + one for linking with your todo tool; flip as you go.
 
 **Pre-flight — project-required custom fields** (per-Jira-project): do ONE validation create (or `validate_only: true` batch) to surface what this project requires; discover field IDs via `jira_search_fields` once, cache for the turn. Unclear required value → **stop and ask**.
 
 **Preferred path (supports parent): one `jira_create_issue` per ticket.**
 ```
-mcp__mcp-atlassian__jira_create_issue(
+jira_create_issue(
   project_key: "PROJ",
   summary: "[Mobile] Login screen UI",
   issue_type: "Task",                              // per ticket, from the intent table
@@ -186,7 +188,7 @@ Record each returned `key`.
 
 Skip if Phase 5 set `parent` everywhere. Otherwise per child:
 ```
-mcp__mcp-atlassian__jira_create_issue_link(
+jira_create_issue_link(
   link_type: "Relates",            // or "Blocks" for dependency order
   inward_issue_key: "<PARENT-KEY>", outward_issue_key: "<CHILD-KEY>"
 )
@@ -203,7 +205,7 @@ Emit a `DONE` block: parent (note if created this run), project, the `KEY  TYPE 
 
 ## Phase 8 — Optional Test Plan Handoff
 
-Ask once whether to draft a test plan from the parent's AC via a test-plan skill (if installed) — pass parent key, AC list, created keys, `contentLanguage`. On "later", add a `test-plan-pending` label to the parent. No test-plan skill installed → say so and stop.
+Ask once whether to draft a test plan from the parent's AC via a test-plan skill if one is installed (search your skills for one) — pass parent key, AC list, created keys, `contentLanguage`. On "later", add a `test-plan-pending` label to the parent. No test-plan skill installed → say so and skip this phase.
 
 ---
 
@@ -217,4 +219,4 @@ Ask once whether to draft a test plan from the parent's AC via a test-plan skill
 - Pass `additional_fields` as an object — it's a JSON **string**; or use `Sub-task` (hyphen) — it's `Subtask`.
 - Use `jira_batch_create_issues` for Subtasks or when parent must be set at creation.
 - Loop-retry a failing create without changing input — surface the error and stop.
-- Read Jira via a CLI — `mcp__mcp-atlassian__*` only.
+- Read Jira via a CLI — the Atlassian MCP tools only.

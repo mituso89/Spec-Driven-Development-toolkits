@@ -1,6 +1,6 @@
 ---
 name: m-finishing-a-development-branch
-description: Use when implementation is complete, all tests pass, and you need to decide how to integrate the work - guides completion of development work by presenting structured options for merge, PR, or cleanup
+description: "Use when implementation is complete, all tests pass, and you need to decide how to integrate the work - guides completion of development work by presenting structured options for merge, PR, or cleanup. Triggers: merge this, open a PR, we're done, finish the branch, clean up the worktree."
 ---
 
 # Finishing a Development Branch
@@ -57,11 +57,15 @@ This determines which menu to show and how cleanup works:
 ### Step 3: Determine Base Branch
 
 ```bash
-# Try common base branches
-git merge-base HEAD main 2>/dev/null || git merge-base HEAD master 2>/dev/null
+# 1. Ask the remote which branch is the default
+git rev-parse --abbrev-ref origin/HEAD 2>/dev/null   # e.g. origin/main
+
+# 2. Fallback: check which conventional branch exists locally
+git show-ref --verify --quiet refs/heads/main && echo main
+git show-ref --verify --quiet refs/heads/master && echo master
 ```
 
-Or ask: "This branch split from main - is that correct?"
+If neither resolves (or both `main` and `master` exist), ask: "This branch split from main - is that correct?"
 
 ### Step 4: Present Options
 
@@ -119,6 +123,10 @@ git branch -d <feature-branch>
 ```
 
 #### Option 2: Push and Create PR
+
+**Handoffs first:**
+- PR title follows `m-git-commit` conventions — same format as a commit header (`<type>(<scope>): <subject>`); squash merges adopt it.
+- If the project has its own PR-submission skill installed, delegate PR creation to it instead of the inline template below.
 
 ```bash
 # Push branch
@@ -180,7 +188,7 @@ WORKTREE_PATH=$(git rev-parse --show-toplevel)
 
 **If `GIT_DIR == GIT_COMMON`:** Normal repo, no worktree to clean up. Done.
 
-**If worktree path is under `.worktrees/`, `worktrees/`, or `~/.config/sdd-toolkit/worktrees/`:** this toolkit created this worktree — we own cleanup.
+**If worktree path is under `.worktrees/` (m-worktree's default), `worktrees/`, or the legacy `~/.config/sdd-toolkit/worktrees/`:** this toolkit created this worktree — we own cleanup. (This list must stay in sync with m-worktree's directory conventions.)
 
 ```bash
 MAIN_ROOT=$(git -C "$(git rev-parse --git-common-dir)/.." rev-parse --show-toplevel)
@@ -224,7 +232,7 @@ git worktree prune  # Self-healing: clean up any stale registrations
 
 **Cleaning up harness-owned worktrees**
 - **Problem:** Removing a worktree the harness created causes phantom state
-- **Fix:** Only clean up worktrees under `.worktrees/`, `worktrees/`, or `~/.config/sdd-toolkit/worktrees/`
+- **Fix:** Only clean up worktrees under `.worktrees/` (m-worktree's default), `worktrees/`, or the legacy `~/.config/sdd-toolkit/worktrees/` — keep this list in sync with m-worktree's directory conventions
 
 **No confirmation for discard**
 - **Problem:** Accidentally delete work

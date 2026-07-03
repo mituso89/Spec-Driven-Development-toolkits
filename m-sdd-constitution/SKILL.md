@@ -5,13 +5,13 @@ description: "SDD phase 1 — establish project principles, conventions, and gua
 
 # SDD — Constitution
 
-> **TL;DR** — Discover existing conventions (1) → elicit/derive principles (2) → write `.sdd/constitution.md` (3) → mark phase done & route (4). Read `~/.config/devin/skills/m-sdd/_shared.md` first.
+> **TL;DR** — Discover existing conventions (0) → elicit/derive principles (1) → write `.sdd/constitution.md` & get approval (2) → route (3 — no marking step: status derives from the file). Read `<skills-root>/m-sdd/_shared.md` first.
 
-The constitution gates all downstream phases. It is project-level (one per project), not per-feature.
+The constitution is advisory context, not an enforced gate: every phase loads it and must respect it, and `m-sdd-analyze` checks all artifacts against it (see `_shared.md` Rule 2). It is project-level (one per project), not per-feature.
 
 ## Phase 0 — Preflight
-- Read `~/.config/devin/skills/m-sdd/_shared.md`.
-- `source ~/.config/devin/skills/m-sdd/sdd-lib.sh; root="$(pwd)"`; ensure scaffold: `sdd_scaffold "$root"`.
+- Read `<skills-root>/m-sdd/_shared.md`.
+- `source <skills-root>/m-sdd/sdd-lib.sh; root="$(pwd)"`; ensure scaffold: `sdd_scaffold "$root"`.
 - **Discover:** scan the project for existing standards — `AGENTS.md`, `CLAUDE.md`, `README`, `CONTRIBUTING`, lint/format config, existing `docs/` conventions. Reuse them; do not invent rules that contradict the repo.
 
 ## Phase 1 — Draft

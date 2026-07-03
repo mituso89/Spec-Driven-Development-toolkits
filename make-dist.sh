@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 # Build a clean, recipient-ready ZIP of the toolkit for handoff (Bitbucket / direct).
 #
-# Ships exactly what an installer needs — install.sh, README.md, and every h-*
+# Ships exactly what an installer needs — install.sh, README.md, and every m-*
 # skill folder — and drops maintainer-only files (.git/, docs/, vendor.sh, tests,
 # this script). Staged via rsync so excludes are reliable and the source tree is
 # never touched. Output contains a top-level sdd-toolkit/ folder, so a recipient

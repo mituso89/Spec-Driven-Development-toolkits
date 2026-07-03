@@ -13,7 +13,7 @@ until I say go."
 
 1. Open a terminal in a real project where the toolkit is installed.
    - Confirm install once: `bash install.sh` was run; restart Claude Code so the
-     `h-sdd*` skills are picked up.
+     `m-sdd*` skills are picked up.
    - Prerequisite is just `jq` (`brew install jq`).
 2. Pick **one small, real feature** the owner will recognize (e.g. "let customers
    save a payment method"). Keep it tiny — this is a walkthrough, not real delivery.
@@ -37,12 +37,12 @@ until I say go."
 > written down."
 
 ### 2. Show the starting point (30 sec)
-Run: `h-sdd`
+Run: `m-sdd`
 - Point out: it shows **what phase we're in** and the **same path every feature
   follows**. "This is repeatable — every feature goes through these steps."
 
 ### 3. Write the spec — the WHAT and WHY (90 sec)
-Run: `h-sdd-specify` for the chosen feature.
+Run: `m-sdd-specify` for the chosen feature.
 - Open `specs/<feature>/spec.md` and read 2–3 lines aloud.
 - Emphasize: **"Notice there's no technical jargon. This is written for you. It
   says what we're building, why, and how we'll know it's done."**

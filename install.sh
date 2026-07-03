@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
-# Symlink every bundled skill (h-*) into ~/.config/devin/skills so Devin CLI loads them.
+# Symlink every bundled skill (m-*) into ~/.config/devin/skills so Devin CLI loads them.
 # NEVER clobbers an existing REAL dir — preserves a user's own hand-authored skills
-# (e.g. your original h-ask); only that user's missing skills get the vendored copy.
+# (e.g. your original m-ask); only that user's missing skills get the vendored copy.
 set -euo pipefail
 PROJECT_DIR=""
 TOOL_NAME=""
@@ -22,7 +22,7 @@ fi
 SRC="$(cd "$(dirname "$0")" && pwd)"
 DEST="$HOME/.config/devin/skills"
 mkdir -p "$DEST"
-for d in "$SRC"/h-*; do
+for d in "$SRC"/m-*; do
   [ -d "$d" ] || continue
   name="$(basename "$d")"
   if [ -e "$DEST/$name" ] && [ ! -L "$DEST/$name" ]; then
@@ -35,8 +35,8 @@ echo "Done. Restart Devin CLI or re-scan skills if needed."
 
 # --project: copy quality companion skills into a target project's .devin/skills/
 if [ -n "$PROJECT_DIR" ]; then
-  QUALITY_SKILLS="h-security-and-hardening h-performance-optimization \
-h-debugging-and-error-recovery h-api-and-interface-design h-frontend-ui-engineering"
+  QUALITY_SKILLS="m-security-and-hardening m-performance-optimization \
+m-debugging-and-error-recovery m-api-and-interface-design m-frontend-ui-engineering"
   PROJ_DEST="$PROJECT_DIR/.devin/skills"
   mkdir -p "$PROJ_DEST"
   echo "Installing quality companion skills into $PROJ_DEST"
@@ -90,10 +90,10 @@ if [ -n "$TOOL_NAME" ]; then
       echo ""
       echo "---"
       echo ""
-      cat "$SRC/h-sdd/phase-instructions.md"
+      cat "$SRC/m-sdd/phase-instructions.md"
       echo ""
       for phase in constitution specify clarify plan tasks analyze implement; do
-        pi="$SRC/h-sdd-$phase/phase-instructions.md"
+        pi="$SRC/m-sdd-$phase/phase-instructions.md"
         if [ -f "$pi" ]; then
           echo ""
           echo "---"

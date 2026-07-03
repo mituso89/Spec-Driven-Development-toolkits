@@ -1,33 +1,33 @@
 # Multi-Tool Support Implementation Plan
 
-> **For agentic workers:** REQUIRED SUB-SKILL: Use h-subagent-driven-development (recommended) or h-executing-plans to implement this plan task-by-task. Steps use checkbox (`- [ ]`) syntax for tracking.
+> **For agentic workers:** REQUIRED SUB-SKILL: Use m-subagent-driven-development (recommended) or m-executing-plans to implement this plan task-by-task. Steps use checkbox (`- [ ]`) syntax for tracking.
 
 **Goal:** Add `phase-instructions.md` (tool-agnostic canonical source) to every pipeline phase, slim each `SKILL.md` to a Devin adapter, extend `install.sh` with `--tool <name> --project <path>` to write Claude/Cursor/Windsurf/AGENTS.md adapters into a project, and write `.sdd/pipeline.md` for non-Devin state tracking.
 
-**Architecture:** Approach A — shared phase docs + per-tool adapter layer. Each `h-sdd-<phase>/` directory gets a `phase-instructions.md` (no shell calls, no Devin paths). `SKILL.md` keeps the YAML frontmatter and Devin shell calls. `install.sh --tool` concatenates `phase-instructions.md` files at install time via `cat` — no templating engine. `_shared.md` keeps its full Devin content; `h-sdd/phase-instructions.md` is its tool-agnostic twin written alongside it.
+**Architecture:** Approach A — shared phase docs + per-tool adapter layer. Each `m-sdd-<phase>/` directory gets a `phase-instructions.md` (no shell calls, no Devin paths). `SKILL.md` keeps the YAML frontmatter and Devin shell calls. `install.sh --tool` concatenates `phase-instructions.md` files at install time via `cat` — no templating engine. `_shared.md` keeps its full Devin content; `m-sdd/phase-instructions.md` is its tool-agnostic twin written alongside it.
 
-**Tech Stack:** Bash (`install.sh`), Markdown (`.md` files), no new runtime dependencies. All existing tests (`bash h-sdd/test_sdd_lib.sh`) must continue to pass. `sdd-lib.sh` and `_shared.md` Devin behavior are untouched.
+**Tech Stack:** Bash (`install.sh`), Markdown (`.md` files), no new runtime dependencies. All existing tests (`bash m-sdd/test_sdd_lib.sh`) must continue to pass. `sdd-lib.sh` and `_shared.md` Devin behavior are untouched.
 
 ---
 
 ## File Map
 
 ### Files created
-- `h-sdd/phase-instructions.md` — tool-agnostic shared rules (extracted from `_shared.md`)
-- `h-sdd-constitution/phase-instructions.md`
-- `h-sdd-specify/phase-instructions.md`
-- `h-sdd-clarify/phase-instructions.md`
-- `h-sdd-plan/phase-instructions.md`
-- `h-sdd-tasks/phase-instructions.md`
-- `h-sdd-analyze/phase-instructions.md`
-- `h-sdd-implement/phase-instructions.md`
+- `m-sdd/phase-instructions.md` — tool-agnostic shared rules (extracted from `_shared.md`)
+- `m-sdd-constitution/phase-instructions.md`
+- `m-sdd-specify/phase-instructions.md`
+- `m-sdd-clarify/phase-instructions.md`
+- `m-sdd-plan/phase-instructions.md`
+- `m-sdd-tasks/phase-instructions.md`
+- `m-sdd-analyze/phase-instructions.md`
+- `m-sdd-implement/phase-instructions.md`
 
 ### Files modified
 - `install.sh` — add `--tool` + `--project` flag handling and adapter assembly logic
 - `README.md` — multi-tool section, install examples, developer note
 
 ### Files intentionally unchanged
-- `h-sdd/sdd-lib.sh`, `h-sdd/test_sdd_lib.sh`, `h-sdd/_shared.md` (Devin behavior preserved)
+- `m-sdd/sdd-lib.sh`, `m-sdd/test_sdd_lib.sh`, `m-sdd/_shared.md` (Devin behavior preserved)
 - All existing `SKILL.md` files (Devin behavior preserved — slimming is optional future work; adapters are additive)
 - `vendor.sh` (picks up `phase-instructions.md` automatically as they live inside `h-*` folders)
 
@@ -35,14 +35,14 @@
 
 ---
 
-## Task 1: Write `h-sdd/phase-instructions.md` (shared tool-agnostic rules)
+## Task 1: Write `m-sdd/phase-instructions.md` (shared tool-agnostic rules)
 
 **Files:**
-- Create: `h-sdd/phase-instructions.md`
+- Create: `m-sdd/phase-instructions.md`
 
 This is the tool-agnostic twin of `_shared.md`. It contains the three shared rules, artifact locations, and routing descriptions — with all Devin-specific shell calls and `~/.config/devin/…` paths removed.
 
-- [ ] **Step 1: Write `h-sdd/phase-instructions.md`**
+- [ ] **Step 1: Write `m-sdd/phase-instructions.md`**
 
 Create the file with this exact content:
 
@@ -128,7 +128,7 @@ Pipeline order: `constitution → specify → clarify → plan → tasks → ana
 
 ```bash
 grep -n "config/devin\|sdd-lib\|sdd_set_phase\|sdd_require\|sdd_scaffold\|source ~" \
-  h-sdd/phase-instructions.md && echo "FAIL — Devin-specific content found" || echo "OK"
+  m-sdd/phase-instructions.md && echo "FAIL — Devin-specific content found" || echo "OK"
 ```
 
 Expected: `OK`
@@ -136,8 +136,8 @@ Expected: `OK`
 - [ ] **Step 3: Commit**
 
 ```bash
-git add h-sdd/phase-instructions.md
-git commit -m "feat: add h-sdd/phase-instructions.md — tool-agnostic shared SDD rules
+git add m-sdd/phase-instructions.md
+git commit -m "feat: add m-sdd/phase-instructions.md — tool-agnostic shared SDD rules
 
 Canonical tool-agnostic twin of _shared.md. Contains the three shared
 rules, HITL gate table, artifact locations, routing, and non-Devin
@@ -149,13 +149,13 @@ state tracking instructions. No shell calls, no Devin-specific paths."
 ## Task 2: Write `phase-instructions.md` for each pipeline phase
 
 **Files:**
-- Create: `h-sdd-constitution/phase-instructions.md`
-- Create: `h-sdd-specify/phase-instructions.md`
-- Create: `h-sdd-clarify/phase-instructions.md`
-- Create: `h-sdd-plan/phase-instructions.md`
-- Create: `h-sdd-tasks/phase-instructions.md`
-- Create: `h-sdd-analyze/phase-instructions.md`
-- Create: `h-sdd-implement/phase-instructions.md`
+- Create: `m-sdd-constitution/phase-instructions.md`
+- Create: `m-sdd-specify/phase-instructions.md`
+- Create: `m-sdd-clarify/phase-instructions.md`
+- Create: `m-sdd-plan/phase-instructions.md`
+- Create: `m-sdd-tasks/phase-instructions.md`
+- Create: `m-sdd-analyze/phase-instructions.md`
+- Create: `m-sdd-implement/phase-instructions.md`
 
 Each file contains the phase's logic with all Devin shell calls replaced by plain-English state instructions referencing `.sdd/pipeline.md`.
 
@@ -163,7 +163,7 @@ Each file contains the phase's logic with all Devin shell calls replaced by plai
 
 | Devin (remove from phase-instructions.md) | Non-Devin equivalent (include in phase-instructions.md) |
 |---|---|
-| `source ~/.config/devin/skills/h-sdd/sdd-lib.sh` | _(omit — non-Devin tools don't run shell)_ |
+| `source ~/.config/devin/skills/m-sdd/sdd-lib.sh` | _(omit — non-Devin tools don't run shell)_ |
 | `sdd_scaffold "$root"` | Create `.sdd/` and `specs/` directories if absent |
 | `sdd_require "$root" "$id" specify "approved"` | Read `.sdd/pipeline.md`; if `specify` is not `approved`, stop and tell the user to complete the specify phase first |
 | `sdd_require "$root" "$id" plan "approved"` | Read `.sdd/pipeline.md`; if `plan` is not `approved`, stop |
@@ -176,12 +176,12 @@ Each file contains the phase's logic with all Devin shell calls replaced by plai
 | `sdd_active_feature "$root"` / `sdd_create_feature` | Read the active feature from `.sdd/pipeline.md`'s `## Feature:` heading; if absent, ask the user for a feature name and add it |
 | `sdd_list "$root"` | Read all `## Feature:` sections in `.sdd/pipeline.md` |
 
-- [ ] **Step 1: Write `h-sdd-constitution/phase-instructions.md`**
+- [ ] **Step 1: Write `m-sdd-constitution/phase-instructions.md`**
 
 ```markdown
 # SDD — Constitution Phase
 
-> Read `h-sdd/phase-instructions.md` (shared rules) first.
+> Read `m-sdd/phase-instructions.md` (shared rules) first.
 
 **Pipeline:** → constitution → specify
 
@@ -212,12 +212,12 @@ The constitution is project-level (one per project, not per feature). It gates a
 - If there is an active feature, route to the specify phase; otherwise tell the user to create one.
 ```
 
-- [ ] **Step 2: Write `h-sdd-specify/phase-instructions.md`**
+- [ ] **Step 2: Write `m-sdd-specify/phase-instructions.md`**
 
 ```markdown
 # SDD — Specify Phase
 
-> Read `h-sdd/phase-instructions.md` (shared rules) first.
+> Read `m-sdd/phase-instructions.md` (shared rules) first.
 
 **Pipeline:** constitution → specify → clarify
 
@@ -264,12 +264,12 @@ Fix issues and re-check — at most 3 iterations, then proceed regardless (note 
 - Route: suggest clarify phase (optional) or plan phase.
 ```
 
-- [ ] **Step 3: Write `h-sdd-clarify/phase-instructions.md`**
+- [ ] **Step 3: Write `m-sdd-clarify/phase-instructions.md`**
 
 ```markdown
 # SDD — Clarify Phase (Optional)
 
-> Read `h-sdd/phase-instructions.md` (shared rules) first.
+> Read `m-sdd/phase-instructions.md` (shared rules) first.
 
 **Pipeline:** specify → clarify → plan. This phase is optional.
 
@@ -300,12 +300,12 @@ Fix issues and re-check — at most 3 iterations, then proceed regardless (note 
 - Route to plan phase.
 ```
 
-- [ ] **Step 4: Write `h-sdd-plan/phase-instructions.md`**
+- [ ] **Step 4: Write `m-sdd-plan/phase-instructions.md`**
 
 ```markdown
 # SDD — Plan Phase
 
-> Read `h-sdd/phase-instructions.md` (shared rules) first.
+> Read `m-sdd/phase-instructions.md` (shared rules) first.
 
 **Pipeline:** clarify → plan → tasks
 
@@ -335,12 +335,12 @@ Using the writing-plans skill (or equivalent), produce `specs/<id>/plan.md` (sta
 - Route to tasks phase.
 ```
 
-- [ ] **Step 5: Write `h-sdd-tasks/phase-instructions.md`**
+- [ ] **Step 5: Write `m-sdd-tasks/phase-instructions.md`**
 
 ```markdown
 # SDD — Tasks Phase
 
-> Read `h-sdd/phase-instructions.md` (shared rules) first.
+> Read `m-sdd/phase-instructions.md` (shared rules) first.
 
 **Pipeline:** plan → tasks → analyze
 
@@ -362,12 +362,12 @@ Using the writing-plans skill (or equivalent), produce `specs/<id>/plan.md` (sta
 - Route to analyze phase (then implement phase).
 ```
 
-- [ ] **Step 6: Write `h-sdd-analyze/phase-instructions.md`**
+- [ ] **Step 6: Write `m-sdd-analyze/phase-instructions.md`**
 
 ```markdown
 # SDD — Analyze Phase (Optional, Recommended)
 
-> Read `h-sdd/phase-instructions.md` (shared rules) first.
+> Read `m-sdd/phase-instructions.md` (shared rules) first.
 
 **Pipeline:** tasks → analyze → implement. Optional but recommended.
 
@@ -397,12 +397,12 @@ Compare, and record findings in `specs/<id>/analysis.md`:
 - To skip entirely: update `.sdd/pipeline.md`: set `analyze` row to `skipped`.
 ```
 
-- [ ] **Step 7: Write `h-sdd-implement/phase-instructions.md`**
+- [ ] **Step 7: Write `m-sdd-implement/phase-instructions.md`**
 
 ```markdown
 # SDD — Implement Phase
 
-> Read `h-sdd/phase-instructions.md` (shared rules) first.
+> Read `m-sdd/phase-instructions.md` (shared rules) first.
 
 **Pipeline:** analyze → implement → issues
 
@@ -432,7 +432,7 @@ Compare, and record findings in `specs/<id>/analysis.md`:
 
 ```bash
 for phase in constitution specify clarify plan tasks analyze implement; do
-  f="h-sdd-$phase/phase-instructions.md"
+  f="m-sdd-$phase/phase-instructions.md"
   if [ ! -f "$f" ]; then echo "MISSING $f"; continue; fi
   if grep -q "config/devin\|sdd-lib\|sdd_set_phase\|sdd_require\|sdd_scaffold\|source ~" "$f"; then
     echo "FAIL $f — Devin-specific content found"
@@ -447,13 +447,13 @@ Expected: seven `OK` lines, zero `MISSING` or `FAIL`.
 - [ ] **Step 9: Commit**
 
 ```bash
-git add h-sdd-constitution/phase-instructions.md \
-        h-sdd-specify/phase-instructions.md \
-        h-sdd-clarify/phase-instructions.md \
-        h-sdd-plan/phase-instructions.md \
-        h-sdd-tasks/phase-instructions.md \
-        h-sdd-analyze/phase-instructions.md \
-        h-sdd-implement/phase-instructions.md
+git add m-sdd-constitution/phase-instructions.md \
+        m-sdd-specify/phase-instructions.md \
+        m-sdd-clarify/phase-instructions.md \
+        m-sdd-plan/phase-instructions.md \
+        m-sdd-tasks/phase-instructions.md \
+        m-sdd-analyze/phase-instructions.md \
+        m-sdd-implement/phase-instructions.md
 git commit -m "feat: add phase-instructions.md to all seven pipeline phases
 
 Tool-agnostic canonical source per phase. No shell calls, no
@@ -564,10 +564,10 @@ if [ -n "$TOOL_NAME" ]; then
       echo ""
       echo "---"
       echo ""
-      cat "$SRC/h-sdd/phase-instructions.md"
+      cat "$SRC/m-sdd/phase-instructions.md"
       echo ""
       for phase in constitution specify clarify plan tasks analyze implement; do
-        pi="$SRC/h-sdd-$phase/phase-instructions.md"
+        pi="$SRC/m-sdd-$phase/phase-instructions.md"
         if [ -f "$pi" ]; then
           echo ""
           echo "---"
@@ -779,7 +779,7 @@ as the canonical source and SKILL.md as the Devin adapter."
 - [ ] **Step 1: Run the existing sdd-lib test suite**
 
 ```bash
-bash h-sdd/test_sdd_lib.sh
+bash m-sdd/test_sdd_lib.sh
 ```
 
 Expected: all tests pass, no failures.
@@ -787,7 +787,7 @@ Expected: all tests pass, no failures.
 - [ ] **Step 2: Verify `sdd-lib.sh` is unchanged**
 
 ```bash
-git diff h-sdd/sdd-lib.sh
+git diff m-sdd/sdd-lib.sh
 ```
 
 Expected: empty output (no changes).
@@ -795,7 +795,7 @@ Expected: empty output (no changes).
 - [ ] **Step 3: Verify `_shared.md` is unchanged**
 
 ```bash
-git diff h-sdd/_shared.md
+git diff m-sdd/_shared.md
 ```
 
 Expected: empty output (no changes).
@@ -812,12 +812,12 @@ Expected: all `h-*` skills installed/linked with no errors, ends with `Done.`
 
 ```bash
 for phase in constitution specify clarify plan tasks analyze implement; do
-  f="$HOME/.config/devin/skills/h-sdd-$phase/phase-instructions.md"
-  [ -e "$f" ] && echo "OK h-sdd-$phase" || echo "MISSING h-sdd-$phase"
+  f="$HOME/.config/devin/skills/m-sdd-$phase/phase-instructions.md"
+  [ -e "$f" ] && echo "OK m-sdd-$phase" || echo "MISSING m-sdd-$phase"
 done
 ```
 
-Expected: seven `OK` lines (symlinks resolve because `install.sh` symlinks the whole `h-sdd-<phase>/` folder).
+Expected: seven `OK` lines (symlinks resolve because `install.sh` symlinks the whole `m-sdd-<phase>/` folder).
 
 - [ ] **Step 6: Final status check**
 
@@ -832,7 +832,7 @@ If clean, done. If any unstaged changes remain, stage and commit with an appropr
 ## Acceptance Checklist (from design spec)
 
 - [ ] Every pipeline phase has a `phase-instructions.md` with no Devin-specific shell calls or `~/.config/devin/…` paths
-- [ ] Every `SKILL.md` behavior is identical to today — `bash h-sdd/test_sdd_lib.sh` passes
+- [ ] Every `SKILL.md` behavior is identical to today — `bash m-sdd/test_sdd_lib.sh` passes
 - [ ] `bash install.sh --tool claude --project <path>` writes `<path>/.claude/CLAUDE.md` with all phase instructions in pipeline order
 - [ ] `bash install.sh --tool cursor --project <path>` writes `<path>/.cursorrules`
 - [ ] `bash install.sh --tool windsurf --project <path>` writes `<path>/.windsurfrules`
@@ -842,5 +842,5 @@ If clean, done. If any unstaged changes remain, stage and commit with an appropr
 - [ ] `bash install.sh --project <path>` (quality skills) works exactly as today — zero regression
 - [ ] `bash install.sh --tool <name>` without `--project` exits 1 with a clear usage message
 - [ ] No adapter file is clobbered if it already exists in the target project
-- [ ] `bash h-sdd/test_sdd_lib.sh` passes — `sdd-lib.sh` unchanged
-- [ ] `h-sdd/_shared.md` Devin behavior is identical — file unchanged
+- [ ] `bash m-sdd/test_sdd_lib.sh` passes — `sdd-lib.sh` unchanged
+- [ ] `m-sdd/_shared.md` Devin behavior is identical — file unchanged

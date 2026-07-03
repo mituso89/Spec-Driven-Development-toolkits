@@ -18,7 +18,7 @@ Make the SDD pipeline available to any AI agent tool — not just Devin CLI. Tar
 - `vendor.sh` requires no changes — `phase-instructions.md` files live inside `h-*` folders that vendor already re-syncs
 - Non-Devin tools cannot run shell at spec time — state tracking must be Markdown-only for them
 - `install.sh --tool` never clobbers an existing adapter file in the target project
-- Every pipeline phase gets a `phase-instructions.md`; non-pipeline skills (`h-sdd-knowledge`, `h-sdd-checklist`, `h-sdd-tasks-to-issues`) are excluded
+- Every pipeline phase gets a `phase-instructions.md`; non-pipeline skills (`m-sdd-knowledge`, `m-sdd-checklist`, `m-sdd-tasks-to-issues`) are excluded
 
 ---
 
@@ -26,8 +26,8 @@ Make the SDD pipeline available to any AI agent tool — not just Devin CLI. Tar
 
 - `install.sh:32-42` — existing `for d in "$SRC"/h-*` loop; new flags are additive, no loop changes
 - `vendor.sh:15-23` — copies entire `h-*` folders; `phase-instructions.md` files are picked up automatically
-- `h-sdd/_shared.md` — Devin adapter pattern; `h-sdd/phase-instructions.md` is its tool-agnostic twin
-- `h-sdd-specify/SKILL.md:39-43` — example of Devin-specific shell calls that must stay out of `phase-instructions.md`
+- `m-sdd/_shared.md` — Devin adapter pattern; `m-sdd/phase-instructions.md` is its tool-agnostic twin
+- `m-sdd-specify/SKILL.md:39-43` — example of Devin-specific shell calls that must stay out of `phase-instructions.md`
 - `docs/specs/2026-07-02-agent-skills-integration-design.md` — established `--project` flag pattern this builds on
 
 ---
@@ -48,21 +48,21 @@ Each pipeline phase directory gets a `phase-instructions.md` — the canonical, 
 - Artifact paths — these are project-relative (`.sdd/constitution.md`, `specs/<id>/spec.md`) and identical across all tools
 - Pipeline order and routing descriptions
 - Interview and convergence rules
-- Companion skill hints (e.g. optional `h-api-and-interface-design` note)
+- Companion skill hints (e.g. optional `m-api-and-interface-design` note)
 
 ### What stays Devin-only (in `SKILL.md` only, never in `phase-instructions.md`)
 
-- `source ~/.config/devin/skills/h-sdd/sdd-lib.sh`
+- `source ~/.config/devin/skills/m-sdd/sdd-lib.sh`
 - All `sdd_set_phase`, `sdd_require`, `sdd_scaffold`, `sdd_active_feature`, `sdd_create_feature` calls
 - `~/.config/devin/skills/…` path references
 - YAML frontmatter (`name:`, `description:`, trigger keywords)
 
-### Shared rules (`h-sdd/`)
+### Shared rules (`m-sdd/`)
 
 | File | Role |
 |---|---|
-| `h-sdd/phase-instructions.md` | Tool-agnostic shared rules — the three rules, artifact locations, routing, and HITL gate descriptions extracted from `_shared.md`, with all Devin-specific shell content removed |
-| `h-sdd/_shared.md` | Devin adapter — retains the tool-agnostic content (now also in `phase-instructions.md`) **plus** the lib usage block and shell-call examples that are Devin-only; no file-include mechanism, content is duplicated by design so Devin keeps a self-contained file |
+| `m-sdd/phase-instructions.md` | Tool-agnostic shared rules — the three rules, artifact locations, routing, and HITL gate descriptions extracted from `_shared.md`, with all Devin-specific shell content removed |
+| `m-sdd/_shared.md` | Devin adapter — retains the tool-agnostic content (now also in `phase-instructions.md`) **plus** the lib usage block and shell-call examples that are Devin-only; no file-include mechanism, content is duplicated by design so Devin keeps a self-contained file |
 
 ---
 
@@ -79,7 +79,7 @@ Each pipeline phase directory gets a `phase-instructions.md` — the canonical, 
 
 Each adapter file is assembled by `install.sh` via concatenation in this order:
 1. Short header: `# SDD Pipeline — <tool name>` + one-line description
-2. `h-sdd/phase-instructions.md` (shared rules)
+2. `m-sdd/phase-instructions.md` (shared rules)
 3. Each pipeline phase's `phase-instructions.md` in pipeline order, separated by `---`
 
 Pipeline order: `constitution → specify → clarify → plan → tasks → analyze → implement`
@@ -151,44 +151,44 @@ New files marked `← NEW`. Unchanged files not listed except where relevant.
 
 ```
 sdd-toolkit-devin/
-  h-sdd/
+  m-sdd/
     phase-instructions.md      ← NEW — tool-agnostic shared rules
     _shared.md                 ← Devin adapter (incorporates phase-instructions.md; shell calls stay)
     sdd-lib.sh                 ← unchanged
     test_sdd_lib.sh            ← unchanged
     templates/                 ← unchanged
 
-  h-sdd-constitution/
+  m-sdd-constitution/
     phase-instructions.md      ← NEW — tool-agnostic phase logic (no shell calls, no Devin paths)
     SKILL.md                   ← Devin adapter: YAML frontmatter + phase-instructions.md content reproduced + Devin shell calls appended
 
-  h-sdd-specify/
+  m-sdd-specify/
     phase-instructions.md      ← NEW
     SKILL.md                   ← Devin adapter (same pattern)
 
-  h-sdd-clarify/
+  m-sdd-clarify/
     phase-instructions.md      ← NEW
     SKILL.md                   ← Devin adapter
 
-  h-sdd-plan/
+  m-sdd-plan/
     phase-instructions.md      ← NEW
     SKILL.md                   ← Devin adapter
 
-  h-sdd-tasks/
+  m-sdd-tasks/
     phase-instructions.md      ← NEW
     SKILL.md                   ← Devin adapter
 
-  h-sdd-analyze/
+  m-sdd-analyze/
     phase-instructions.md      ← NEW
     SKILL.md                   ← Devin adapter
 
-  h-sdd-implement/
+  m-sdd-implement/
     phase-instructions.md      ← NEW
     SKILL.md                   ← Devin adapter
 
-  h-sdd-knowledge/             ← unchanged (not a pipeline phase)
-  h-sdd-checklist/             ← unchanged (not a pipeline phase)
-  h-sdd-tasks-to-issues/       ← unchanged (not a pipeline phase)
+  m-sdd-knowledge/             ← unchanged (not a pipeline phase)
+  m-sdd-checklist/             ← unchanged (not a pipeline phase)
+  m-sdd-tasks-to-issues/       ← unchanged (not a pipeline phase)
 
   install.sh                   ← extended: --tool + --project flags
   vendor.sh                    ← unchanged
@@ -206,7 +206,7 @@ sdd-toolkit-devin/
 ## Acceptance criteria
 
 - [ ] Every pipeline phase (`constitution`, `specify`, `clarify`, `plan`, `tasks`, `analyze`, `implement`) has a `phase-instructions.md` containing no Devin-specific shell calls or `~/.config/devin/…` paths
-- [ ] Every `SKILL.md` behavior is identical to today — Devin regression tests pass (`bash h-sdd/test_sdd_lib.sh`)
+- [ ] Every `SKILL.md` behavior is identical to today — Devin regression tests pass (`bash m-sdd/test_sdd_lib.sh`)
 - [ ] `bash install.sh --tool claude --project <path>` writes `<path>/.claude/CLAUDE.md` with all phase instructions concatenated in pipeline order
 - [ ] `bash install.sh --tool cursor --project <path>` writes `<path>/.cursorrules`
 - [ ] `bash install.sh --tool windsurf --project <path>` writes `<path>/.windsurfrules`
@@ -216,8 +216,8 @@ sdd-toolkit-devin/
 - [ ] `bash install.sh --project <path>` (quality skills) works exactly as today — zero regression
 - [ ] `bash install.sh --tool <name>` without `--project` exits 1 with a clear usage message
 - [ ] No adapter file is clobbered if it already exists in the target project
-- [ ] `bash h-sdd/test_sdd_lib.sh` passes — `sdd-lib.sh` and `_shared.md` content unchanged
-- [ ] `h-sdd/_shared.md` Devin behavior is identical (shell calls, lib usage block unchanged)
+- [ ] `bash m-sdd/test_sdd_lib.sh` passes — `sdd-lib.sh` and `_shared.md` content unchanged
+- [ ] `m-sdd/_shared.md` Devin behavior is identical (shell calls, lib usage block unchanged)
 
 ---
 

@@ -1,13 +1,13 @@
-# SDD Toolkit for Devin CLI (`h-sdd-*`)
+# SDD Toolkit for Devin CLI (`m-sdd-*`)
 
 **Spec-Driven Development for [Devin CLI](https://cli.devin.ai/docs).** Turn a feature idea into a reviewed spec → plan → tasks → working code, with human approval gates at each step. It replicates github/spec-kit's pipeline as a set of Devin CLI skills — no separate CLI to install.
 
-You drive it by talking to Devin CLI. Each phase is a skill (`h-sdd`, `h-sdd-specify`, …) that writes a file you review, and records progress in `.sdd/state.json` so Devin always knows "what phase am I in."
+You drive it by talking to Devin CLI. Each phase is a skill (`m-sdd`, `m-sdd-specify`, …) that writes a file you review, and records progress in `.sdd/state.json` so Devin always knows "what phase am I in."
 
 > **Devin port notes**
-> - This is a port of the original Claude Code toolkit. Skills use the `SKILL.md` format Devin reads, and the bundled `h-sdd/sdd-lib.sh` / `_shared.md` are sourced from `~/.config/devin/skills/h-sdd/` (the global install location below).
+> - This is a port of the original Claude Code toolkit. Skills use the `SKILL.md` format Devin reads, and the bundled `m-sdd/sdd-lib.sh` / `_shared.md` are sourced from `~/.config/devin/skills/m-sdd/` (the global install location below).
 > - `install.sh` installs **globally** into `~/.config/devin/skills/` — available in all your local projects.
-> - **Devin Cloud / remote agents won't see a global install.** Global skills live on your machine, not in your repo. To use these in Devin Cloud, copy the `h-*` folders into a repo's `.devin/skills/` and rewrite the `~/.config/devin/skills/h-sdd/...` sourcing paths to be repo-relative.
+> - **Devin Cloud / remote agents won't see a global install.** Global skills live on your machine, not in your repo. To use these in Devin Cloud, copy the `h-*` folders into a repo's `.devin/skills/` and rewrite the `~/.config/devin/skills/m-sdd/...` sourcing paths to be repo-relative.
 > - Requires `jq` (the state machine depends on it).
 
 ---
@@ -32,7 +32,7 @@ You drive it by talking to Devin CLI. Each phase is a skill (`h-sdd`, `h-sdd-spe
    bash install.sh
    ```
    You'll see a few `installed …` lines ending in `Done.`
-4. **Restart Devin CLI**, then type `h-sdd` (or ask *"what phase am I in?"*). It should respond.
+4. **Restart Devin CLI**, then type `m-sdd` (or ask *"what phase am I in?"*). It should respond.
 
 </details>
 
@@ -53,7 +53,7 @@ You drive it by talking to Devin CLI. Each phase is a skill (`h-sdd`, `h-sdd-spe
    ```
    bash install.sh
    ```
-5. **Restart Devin CLI**, then type `h-sdd`. It should respond.
+5. **Restart Devin CLI**, then type `m-sdd`. It should respond.
 
 </details>
 
@@ -93,7 +93,7 @@ Commit both files to your project repo alongside `.sdd/constitution.md` and `spe
 <summary>🛟 &nbsp;Something went wrong?</summary>
 
 - **`jq: command not found`** — jq isn't installed yet, or the terminal was already open when you installed it. Redo the jq step, then **close and reopen** the terminal.
-- **Typing `h-sdd` does nothing** — fully quit and reopen Devin CLI so it re-scans your skills.
+- **Typing `m-sdd` does nothing** — fully quit and reopen Devin CLI so it re-scans your skills.
 - **`bad interpreter` or `'\r'` errors** — re-download the toolkit as a fresh ZIP (don't move it through other apps), then run `bash install.sh` again.
 - **Still stuck** — copy the exact error text and send it to whoever shared this with you.
 
@@ -102,7 +102,7 @@ Commit both files to your project repo alongside `.sdd/constitution.md` and `spe
 <details>
 <summary>⚙️ &nbsp;For developers</summary>
 
-Install `jq` without the package-manager UI: `brew install jq` (macOS) · `sudo apt install jq` (Linux) · `winget install jqlang.jq` (Windows). Optional MCPs: **context7** enriches `h-sdd-knowledge` doc links; **Atlassian** lets `h-sdd-tasks-to-issues` push tasks to Jira.
+Install `jq` without the package-manager UI: `brew install jq` (macOS) · `sudo apt install jq` (Linux) · `winget install jqlang.jq` (Windows). Optional MCPs: **context7** enriches `m-sdd-knowledge` doc links; **Atlassian** lets `m-sdd-tasks-to-issues` push tasks to Jira.
 
 Clone and install in one go:
 ```bash
@@ -120,7 +120,7 @@ Each pipeline phase also has a `phase-instructions.md` — the tool-agnostic can
 
 You invoke a phase two ways, whichever feels natural:
 - **Just say what you want** — *"let's start spec-driven development for a CSV export feature"* — and the matching skill triggers.
-- **Name the phase** — *"run `h-sdd-specify`"*.
+- **Name the phase** — *"run `m-sdd-specify`"*.
 
 Run each phase **inside the project you're building** (not inside the toolkit repo). The first run scaffolds `.sdd/` and `specs/` in that project.
 
@@ -135,31 +135,31 @@ Each phase reads the previous artifact and writes the next. **Bold** phases belo
 
 ### Step-by-step
 
-**0. Start / check status — `h-sdd`**
+**0. Start / check status — `m-sdd`**
 > *"Start SDD"* or *"what phase am I in?"*
 Scaffolds `.sdd/` + `specs/` in your project, creates or selects a feature, and shows the pipeline status with the next step. Run it anytime to re-orient.
 
-**1. Constitution (once per project) — `h-sdd-constitution`**
+**1. Constitution (once per project) — `m-sdd-constitution`**
 Establishes your project's principles, conventions, and guardrails (stack, testing policy, naming…). Written to `.sdd/constitution.md`; every later phase is checked against it. You approve it.
-*Optional next:* `h-sdd-knowledge` builds `.sdd/knowledge.md` — project facts/glossary that ground the spec questions.
+*Optional next:* `m-sdd-knowledge` builds `.sdd/knowledge.md` — project facts/glossary that ground the spec questions.
 
-**2. Specify — `h-sdd-specify`**  ⟶ *approval gate*
+**2. Specify — `m-sdd-specify`**  ⟶ *approval gate*
 A requirement-first interview. Produces `specs/<id>/spec.md` written for a product owner: **WHAT/WHY only** — prioritized user stories with Given/When/Then, measurable success criteria, **no tech detail**. You review and approve.
-*Optional next:* `h-sdd-clarify` (resolve ambiguities) · `h-sdd-checklist` (requirement-quality "unit tests for English").
+*Optional next:* `m-sdd-clarify` (resolve ambiguities) · `m-sdd-checklist` (requirement-quality "unit tests for English").
 
-**3. Plan — `h-sdd-plan`**  ⟶ *approval gate*
+**3. Plan — `m-sdd-plan`**  ⟶ *approval gate*
 The technical design: stack, architecture, file structure, and a **Testing Strategy** that maps each story/success-criterion to how it's verified. Written to `specs/<id>/plan.md` (+ `research.md`/`data-model.md`/`contracts/` if needed). You approve.
 
-**4. Tasks — `h-sdd-tasks`**
+**4. Tasks — `m-sdd-tasks`**
 Normalizes the plan into an ordered, checkable `specs/<id>/tasks.md`, with `[US#]/[SC-###]` labels tying each task back to a requirement.
 
-**5. Analyze (optional, recommended) — `h-sdd-analyze`**
+**5. Analyze (optional, recommended) — `m-sdd-analyze`**
 Cross-checks constitution ↔ spec ↔ plan ↔ tasks for gaps/contradictions and test/design coverage. Blocks on serious findings; writes `specs/<id>/analysis.md`.
 
-**6. Implement — `h-sdd-implement`**  ⟶ *GO gate*
+**6. Implement — `m-sdd-implement`**  ⟶ *GO gate*
 Builds the feature in an isolated branch/worktree, task by task, ticking boxes in `tasks.md`. Asks for an explicit "go" before writing any code, and finishes with merge/PR options.
 
-**7. Issues (optional) — `h-sdd-tasks-to-issues`**
+**7. Issues (optional) — `m-sdd-tasks-to-issues`**
 Pushes `tasks.md` to Jira as linked dev tickets (needs the Atlassian MCP).
 
 ### Where your work lives
@@ -175,7 +175,7 @@ Commit `.sdd/` and `specs/` to your project repo — they're the durable record 
 
 ## Working with designs & testing
 
-**Already have a UI design?** (e.g. you mocked it up in an AI chat tool.) Drop the HTML — or a Figma link — into `specs/<id>/design/`. `h-sdd-specify`/`h-sdd-plan` will index it (an auto-generated `design/README.md` maps each screen to a user story) and **reference it read-only** while writing the spec and plan. It's a committed visual reference, not a tracked phase or gate.
+**Already have a UI design?** (e.g. you mocked it up in an AI chat tool.) Drop the HTML — or a Figma link — into `specs/<id>/design/`. `m-sdd-specify`/`m-sdd-plan` will index it (an auto-generated `design/README.md` maps each screen to a user story) and **reference it read-only** while writing the spec and plan. It's a committed visual reference, not a tracked phase or gate.
 
 **Testing** is woven in, not a separate phase: the spec holds the acceptance contract (Given/When/Then + `SC-###`), the plan's `## Testing Strategy` says how each is verified, `tasks.md` carries `[US#]/[SC-###]`-labelled test tasks, and `analyze` checks coverage. Whether tests are *mandatory* is a line in your constitution (default if unset: expected, not blocking).
 
@@ -188,34 +188,34 @@ The pipeline's delegates are vendored here (vendored upstream skills gain an `h-
 
 | Phase | Delegates to (bundled) |
 |---|---|
-| specify | — self-contained (convergent requirement-capture interview; optional upstream brainstorm via `h-ask`) |
+| specify | — self-contained (convergent requirement-capture interview; optional upstream brainstorm via `m-ask`) |
 | clarify | — self-contained (ambiguity interview of the user; the user decides, not the codebase) |
-| checklist (optional) | — self-contained (`h-sdd-checklist`, spec-kit `/speckit.checklist` parity) |
-| plan | `h-writing-plans` |
-| implement | `h-subagent-driven-development` (or `h-executing-plans`), `h-using-git-worktrees`/`h-worktree`, `h-finishing-a-development-branch`, `h-git-commit` |
-| tasks-to-issues | `h-story-breakdown` (+ Atlassian MCP) |
-| quality companions (optional) | `h-security-and-hardening`, `h-performance-optimization`, `h-debugging-and-error-recovery`, `h-api-and-interface-design`, `h-frontend-ui-engineering` |
+| checklist (optional) | — self-contained (`m-sdd-checklist`, spec-kit `/speckit.checklist` parity) |
+| plan | `m-writing-plans` |
+| implement | `m-subagent-driven-development` (or `m-executing-plans`), `m-using-git-worktrees`/`m-worktree`, `m-finishing-a-development-branch`, `m-git-commit` |
+| tasks-to-issues | `m-story-breakdown` (+ Atlassian MCP) |
+| quality companions (optional) | `m-security-and-hardening`, `m-performance-optimization`, `m-debugging-and-error-recovery`, `m-api-and-interface-design`, `m-frontend-ui-engineering` |
 
-Plus transitive deps (`h-test-driven-development`, `h-requesting-code-review`, `h-receiving-code-review`). Refresh the vendored copies from your live skills with `bash vendor.sh`.
+Plus transitive deps (`m-test-driven-development`, `m-requesting-code-review`, `m-receiving-code-review`). Refresh the vendored copies from your live skills with `bash vendor.sh`.
 
-### State helpers (`h-sdd/sdd-lib.sh`)
-`sdd_list` (all features, `*` = active) · `sdd_set_active <id>` (switch feature) · `sdd_status` (active feature's pipeline). Never hand-edit `.sdd/state.json`/`config.json` — go through the lib. After changing the lib, run `bash h-sdd/test_sdd_lib.sh` (dual bash+zsh suite).
+### State helpers (`m-sdd/sdd-lib.sh`)
+`sdd_list` (all features, `*` = active) · `sdd_set_active <id>` (switch feature) · `sdd_status` (active feature's pipeline). Never hand-edit `.sdd/state.json`/`config.json` — go through the lib. After changing the lib, run `bash m-sdd/test_sdd_lib.sh` (dual bash+zsh suite).
 
 ### Layout
 ```
 sdd-toolkit/
   install.sh                 # symlinks every h-* skill into ~/.config/devin/skills
   vendor.sh                  # refresh vendored upstream skills (maintainers)
-  h-sdd/                     # umbrella: scaffold / status / route
+  m-sdd/                     # umbrella: scaffold / status / route
     sdd-lib.sh               # jq-backed state machine (zsh-safe)
     test_sdd_lib.sh          # dual bash+zsh unit suite
     _shared.md               # cross-cutting rules (delegate, constitution, HITL gates)
     templates/               # constitution / knowledge / spec / plan / tasks / checklist / design
-  h-sdd-<phase>/SKILL.md     # one folder per pipeline phase
+  m-sdd-<phase>/SKILL.md     # one folder per pipeline phase
   docs/                      # design notes, plans, audits
 ```
 
 ### Troubleshooting
-- **Skills don't trigger:** restart Devin CLI after `install.sh`, and confirm `~/.config/devin/skills/h-sdd` is a symlink to this repo (`ls -l ~/.config/devin/skills/h-sdd`).
+- **Skills don't trigger:** restart Devin CLI after `install.sh`, and confirm `~/.config/devin/skills/m-sdd` is a symlink to this repo (`ls -l ~/.config/devin/skills/m-sdd`).
 - **`MISSING jq`:** install `jq` (see [Install it](#install-it-windows--mac--about-10-minutes-no-coding)) — the state machine can't run without it.
-- **Wrong/old skill loaded:** if you keep your own `h-ask` etc., the installer left yours in place by design; remove your copy if you want the bundled one.
+- **Wrong/old skill loaded:** if you keep your own `m-ask` etc., the installer left yours in place by design; remove your copy if you want the bundled one.

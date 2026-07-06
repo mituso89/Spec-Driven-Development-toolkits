@@ -1,6 +1,6 @@
 ---
 name: m-executing-plans
-description: Use when you have a written implementation plan to execute in a separate session with review checkpoints
+description: "Executes a written implementation plan inline, task by task, following each step exactly and stopping at blockers. Use when a plan exists and subagent dispatch is unavailable or unwanted; otherwise prefer m-subagent-driven-development. Triggers: execute the plan, run the plan, implement the plan."
 ---
 
 # Executing Plans
@@ -11,15 +11,15 @@ Load plan, review critically, execute all tasks, report when complete.
 
 **Announce at start:** "I'm using the m-executing-plans skill to implement this plan."
 
-**Note:** Tell your human partner that this toolkit works much better with access to subagents. The quality of its work will be significantly higher if run on a platform with subagent support (such as Devin, Claude Code, or Codex). If subagents are available, use m-subagent-driven-development instead of this skill.
+**Note:** If subagents are available on this platform, use m-subagent-driven-development instead of this skill.
 
 ## The Process
 
 ### Step 1: Load and Review Plan
 1. Read plan file
 2. Review critically - identify any questions or concerns about the plan
-3. If concerns: Raise them with your human partner before starting
-4. If no concerns: Create todo_write and proceed
+3. If concerns: Raise them with the user before starting
+4. If no concerns: Create a task list in your todo-tracking tool and proceed
 
 ### Step 2: Execute Tasks
 
@@ -49,7 +49,7 @@ After all tasks complete and verified:
 ## When to Revisit Earlier Steps
 
 **Return to Review (Step 1) when:**
-- Partner updates the plan based on your feedback
+- The user updates the plan based on your feedback
 - Fundamental approach needs rethinking
 
 **Don't force through blockers** - stop and ask.

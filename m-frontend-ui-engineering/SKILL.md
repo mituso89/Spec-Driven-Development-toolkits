@@ -1,6 +1,6 @@
 ---
-name: frontend-ui-engineering
-description: Builds production-quality UIs. Use when building or modifying user-facing interfaces. Use when creating components, implementing layouts, managing state, or when the output needs to look and feel production-quality rather than AI-generated.
+name: m-frontend-ui-engineering
+description: "Builds production-quality UIs. Use when building or modifying user-facing interfaces. Use when creating components, implementing layouts, managing state, or when the output needs to look and feel production-quality rather than AI-generated. Examples assume React/Tailwind. Triggers: component, page, layout, UI, CSS, responsive, accessibility, a11y, form, modal, design polish."
 ---
 
 # Frontend UI Engineering
@@ -166,58 +166,7 @@ Don't skip heading levels. Don't use heading styles for non-heading content.
 
 Every component must meet these standards:
 
-### Keyboard Navigation
-
-```tsx
-// Every interactive element must be keyboard accessible
-<button onClick={handleClick}>Click me</button>        // ✓ Focusable by default
-<div onClick={handleClick}>Click me</div>               // ✗ Not focusable
-<div role="button" tabIndex={0} onClick={handleClick}    // ✓ But prefer <button>
-     onKeyDown={e => {
-       if (e.key === 'Enter') handleClick();
-       if (e.key === ' ') e.preventDefault();
-     }}
-     onKeyUp={e => {
-       if (e.key === ' ') handleClick();
-     }}>
-  Click me
-</div>
-```
-
-### ARIA Labels
-
-```tsx
-// Label interactive elements that lack visible text
-<button aria-label="Close dialog"><XIcon /></button>
-
-// Label form inputs
-<label htmlFor="email">Email</label>
-<input id="email" type="email" />
-
-// Or use aria-label when no visible label exists
-<input aria-label="Search tasks" type="search" />
-```
-
-### Focus Management
-
-```tsx
-// Move focus when content changes
-function Dialog({ isOpen, onClose }: DialogProps) {
-  const closeRef = useRef<HTMLButtonElement>(null);
-
-  useEffect(() => {
-    if (isOpen) closeRef.current?.focus();
-  }, [isOpen]);
-
-  // Trap focus inside dialog when open
-  return (
-    <dialog open={isOpen}>
-      <button ref={closeRef} onClick={onClose}>Close</button>
-      {/* dialog content */}
-    </dialog>
-  );
-}
-```
+When implementing keyboard navigation, ARIA labels, or focus management (dialogs, focus traps), read `references/accessibility-checklist.md` for the code patterns and testing tools.
 
 ### Meaningful Empty and Error States
 

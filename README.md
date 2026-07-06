@@ -7,7 +7,7 @@ You drive it by talking to Devin CLI. Each phase is a skill (`m-sdd`, `m-sdd-spe
 > **Devin port notes**
 > - This is a port of the original Claude Code toolkit. Skills use the `SKILL.md` format Devin reads, and the bundled `m-sdd/sdd-lib.sh` / `_shared.md` are sourced from `~/.config/devin/skills/m-sdd/` (the global install location below).
 > - `install.sh` installs **globally** into `~/.config/devin/skills/` — available in all your local projects.
-> - **Devin Cloud / remote agents won't see a global install.** Global skills live on your machine, not in your repo. To use these in Devin Cloud, copy the `h-*` folders into a repo's `.devin/skills/` and rewrite the `~/.config/devin/skills/m-sdd/...` sourcing paths to be repo-relative.
+> - **Devin Cloud / remote agents won't see a global install.** Global skills live on your machine, not in your repo. To use these in Devin Cloud, copy the `m-*` folders into a repo's `.devin/skills/` and rewrite the `~/.config/devin/skills/m-sdd/...` sourcing paths to be repo-relative.
 > - Requires `jq` (the state machine depends on it).
 
 ---
@@ -60,7 +60,7 @@ You drive it by talking to Devin CLI. Each phase is a skill (`m-sdd`, `m-sdd-spe
 **Good to know**
 - It **never overwrites your own skills.** If you already have a skill with the same name, the installer leaves yours alone.
 - Fully self-contained — no accounts, no servers, nothing tied to one machine. Re-run `bash install.sh` anytime to update.
-- **Uninstall:** delete the `h-*` folders the installer added — under `~/.config/devin/skills/` on Mac, or `%APPDATA%\devin\skills\` on Windows.
+- **Uninstall:** delete the `m-*` folders the installer added — under `~/.config/devin/skills/` on Mac, or `%APPDATA%\devin\skills\` on Windows.
 - **Quality companions per project:** to also drop the five quality skills into a specific project's `.devin/skills/`, run:
   ```bash
   bash install.sh --project /path/to/your-project
@@ -108,7 +108,7 @@ Clone and install in one go:
 ```bash
 git clone <your-repo-url> sdd-toolkit && cd sdd-toolkit && bash install.sh
 ```
-On Mac/Linux `install.sh` **symlinks** each `h-*` skill into `~/.config/devin/skills/` (edit-in-place); on Windows/Git Bash it **copies** them (native symlinks need Developer Mode) and marks each with a hidden `.sdd-vendored` file so re-runs update cleanly without touching skills you wrote yourself. Every skill the pipeline needs is vendored in this repo — no external skill prerequisites. Re-sync quality skills from a local `agent-skills` clone: `AGENT_SKILLS_SRC=/path/to/agent-skills/skills bash vendor.sh`
+On Mac/Linux `install.sh` **symlinks** each `m-*` skill into `~/.config/devin/skills/` (edit-in-place); on Windows/Git Bash it **copies** them (native symlinks need Developer Mode) and marks each with a hidden `.sdd-vendored` file so re-runs update cleanly without touching skills you wrote yourself. Every skill the pipeline needs is vendored in this repo — no external skill prerequisites. Re-sync quality skills from a local `agent-skills` clone: `AGENT_SKILLS_SRC=/path/to/agent-skills/skills bash vendor.sh`
 
 Each pipeline phase also has a `phase-instructions.md` — the tool-agnostic canonical source. `SKILL.md` is the Devin adapter (YAML frontmatter + shell calls). `vendor.sh` re-syncs both automatically.
 
@@ -184,7 +184,7 @@ Commit `.sdd/` and `specs/` to your project repo — they're the durable record 
 ## Reference
 
 ### Bundled skills
-The pipeline's delegates are vendored here (vendored upstream skills gain an `h-` prefix so they never collide with your originals):
+The pipeline's delegates are vendored here (vendored upstream skills gain an `m-` prefix so they never collide with your originals):
 
 | Phase | Delegates to (bundled) |
 |---|---|
@@ -192,7 +192,7 @@ The pipeline's delegates are vendored here (vendored upstream skills gain an `h-
 | clarify | — self-contained (ambiguity interview of the user; the user decides, not the codebase) |
 | checklist (optional) | — self-contained (`m-sdd-checklist`, spec-kit `/speckit.checklist` parity) |
 | plan | `m-writing-plans` |
-| implement | `m-subagent-driven-development` (or `m-executing-plans`), `m-using-git-worktrees`/`m-worktree`, `m-finishing-a-development-branch`, `m-git-commit` |
+| implement | `m-subagent-driven-development` (or `m-executing-plans`), `m-worktree`, `m-finishing-a-development-branch`, `m-git-commit` |
 | tasks-to-issues | `m-story-breakdown` (+ Atlassian MCP) |
 | quality companions (optional) | `m-security-and-hardening`, `m-performance-optimization`, `m-debugging-and-error-recovery`, `m-api-and-interface-design`, `m-frontend-ui-engineering` |
 
@@ -204,7 +204,7 @@ Plus transitive deps (`m-test-driven-development`, `m-requesting-code-review`, `
 ### Layout
 ```
 sdd-toolkit/
-  install.sh                 # symlinks every h-* skill into ~/.config/devin/skills
+  install.sh                 # symlinks every m-* skill into ~/.config/devin/skills
   vendor.sh                  # refresh vendored upstream skills (maintainers)
   m-sdd/                     # umbrella: scaffold / status / route
     sdd-lib.sh               # jq-backed state machine (zsh-safe)

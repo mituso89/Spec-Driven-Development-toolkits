@@ -5,7 +5,7 @@ description: "SDD phase 3 (optional) — resolve ambiguities in the spec by inte
 
 # SDD — Clarify
 
-> **TL;DR** — Gate on an approved spec (0) → run a **self-contained ambiguity interview** of the user (1) → append answers under `## Clarifications` in `spec.md` & mark done/skipped (2). Read `~/.config/devin/skills/m-sdd/_shared.md` first.
+> **TL;DR** — Gate on an approved spec (0) → run a **self-contained ambiguity interview** of the user (1) → append answers under `## Clarifications` in `spec.md` & mark done/skipped (2). Read `<skills-root>/m-sdd/_shared.md` first.
 
 **Pipeline:** specify → **clarify** → plan. This phase is optional.
 
@@ -19,7 +19,7 @@ description: "SDD phase 3 (optional) — resolve ambiguities in the spec by inte
 
 ## Phase 0 — Preflight & gate
 - Read `_shared.md`; load constitution. Load `.sdd/knowledge.md` if present — its glossary/facts let you frame sharper, project-grounded questions (framing only — never to answer for the user).
-- `source ~/.config/devin/skills/m-sdd/sdd-lib.sh; root="$(pwd)"; id="$(sdd_active_feature "$root")"`
+- `source <skills-root>/m-sdd/sdd-lib.sh; root="$(pwd)"; id="$(sdd_active_feature "$root")"`
 - `sdd_require "$root" "$id" specify "approved"` — stop if the spec isn't approved.
 - If the user wants to skip: `sdd_set_phase "$root" "$id" clarify skipped` and route to `m-sdd-plan`.
 

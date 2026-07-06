@@ -5,7 +5,7 @@ description: "SDD optional quality gate — per-domain requirement-quality check
 
 # SDD — Checklist (optional, untracked)
 
-> **TL;DR** — Scope domains with the user (1) → generate `specs/<id>/checklists/<domain>.md` testing requirement QUALITY, never implementation (2) → walk failures back into the spec (3). Read `~/.config/devin/skills/m-sdd/_shared.md` first. Like `m-sdd-knowledge`, this is **not a tracked phase** — it never blocks the pipeline and writes no state.
+> **TL;DR** — Scope domains with the user (1) → generate `specs/<id>/checklists/<domain>.md` testing requirement QUALITY, never implementation (2) → walk failures back into the spec (3). Read `<skills-root>/m-sdd/_shared.md` first. Like `m-sdd-knowledge`, this is **not a tracked phase** — it never blocks the pipeline and writes no state.
 
 Checklists are unit tests for English: they probe whether the spec's requirements
 are complete, clear, consistent, measurable, and covered — never whether the code
@@ -14,9 +14,11 @@ spec changes. `m-sdd-analyze` checks artifacts against *each other*; this skill
 checks the spec against *itself*.
 
 ## Phase 0 — Preflight
-- Read `~/.config/devin/skills/m-sdd/_shared.md`. Load `.sdd/constitution.md` and `.sdd/knowledge.md` when present.
-- `source ~/.config/devin/skills/m-sdd/sdd-lib.sh; root="$(pwd)"; id="$(sdd_active_feature "$root")"`
+- Read `<skills-root>/m-sdd/_shared.md`. Load `.sdd/constitution.md` and `.sdd/knowledge.md` when present.
+- `source <skills-root>/m-sdd/sdd-lib.sh; root="$(pwd)"; id="$(sdd_active_feature "$root")"`
+- If `$id` is empty, stop and route to `m-sdd` for feature selection.
 - Require a spec to test: `test -s "$root/specs/$id/spec.md"` — if missing, stop and route to `m-sdd-specify`.
+- When invoked from `m-sdd-specify` Phase 1.5, skip Phase 1 scoping — the domain is `requirements`.
 
 ## Phase 1 — Scope
 Ask the user 1–3 questions (never more than 5) to pick the checklist **domains** —

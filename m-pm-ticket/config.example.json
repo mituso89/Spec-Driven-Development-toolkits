@@ -1,0 +1,10 @@
+{
+  "provider": "jira",
+  "defaultProject": "PROJ",
+  "defaultIssueType": "Bug",
+  "contentLanguage": "en",
+  "defaultPriority": null,
+  "alwaysAddLabels": [],
+  "defaultAssignee": null,
+  "engineeringHandoffLabel": null
+}

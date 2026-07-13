@@ -1,4 +1,5 @@
 {
+  "provider": "jira",
   "defaultProject": "PROJ",
   "defaultIssueType": "Task",
   "parentLinkage": "parent",

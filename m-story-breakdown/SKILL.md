@@ -1,21 +1,23 @@
 ---
 name: m-story-breakdown
-description: "Jira story/epic orchestrator — create the parent story or epic if it doesn't exist, assess whether it needs breaking down, and (on confirmation) create per-stack tickets typed Story/Task/Subtask by intent, linked via the Atlassian MCP. Triggers: break story, split story, decompose story, story breakdown, create subtasks, create dev tickets, story to tasks, jira breakdown, create story, create epic, jira from feature, feature to jira, plan to jira tickets."
+description: "Board story/epic orchestrator (Jira or Azure DevOps) — create the parent story or epic if it doesn't exist, assess whether it needs breaking down, and (on confirmation) create per-stack tickets typed Story/Task/Subtask by intent, linked via the board's MCP tools (provider detected via m-board). Triggers: break story, split story, decompose story, story breakdown, create subtasks, create dev tickets, story to tasks, jira breakdown, azure devops, ado, create story, create epic, jira from feature, feature to jira, plan to jira tickets, tasks to work items."
 ---
 
-# Jira — Story/Epic Breakdown Orchestrator
+# Story/Epic Breakdown Orchestrator (Jira / Azure DevOps)
 
 > **TL;DR** — Expand (0) → **user confirms** → resolve parent: fetch it, or **create the story/epic** if none exists (1) → **assess: does this need breakdown at all?** recommend, user decides (2) → verify stacks + slice, typing each ticket Story/Task/Subtask **by intent** (3) → propose (4) → **user confirms** → create (5) → link (6) → deliver (7) → optional test-plan handoff (8).
 
-Follow every phase in order. **Do NOT create any Jira issue until its user gate has passed** (Phase 1 gate for the parent, Phase 4 gate for children).
+Follow every phase in order. **Do NOT create any ticket until its user gate has passed** (Phase 1 gate for the parent, Phase 4 gate for children).
 
-All Jira work uses the Atlassian MCP's tools (`jira_create_issue`, `jira_get_issue`, …) — never a CLI. Discover the exact prefixed tool names via your tool-search mechanism (server prefixes vary per install); the code blocks below use the bare tool names. If a required tool is not loaded, fetch its schema first.
+All board work uses the provider's MCP tools — never a CLI. **Provider detection is delegated to the sibling `m-board` skill** (Phase −1); concrete tool names, query language, and type/field mapping come from `m-board/providers/<provider>.md`. The code blocks below show the Jira self-hosted surface (`jira_create_issue`, `jira_get_issue`, …) as the worked example — map names through the provider file (Jira connector camelCase, or ADO work-item tools). Discover the exact prefixed tool names via your tool-search mechanism (server prefixes vary per install); if a required tool is not loaded, fetch its schema first.
 
-> **Install location** — portable: works from any skills root, project-local or global (`<skills-root>/m-story-breakdown/`, where `<skills-root>` is the directory this skill was loaded from). The Atlassian MCP must be reachable; a project `.mcp.json` wins over global MCP config.
+> **Install location** — portable: works from any skills root, project-local or global (`<skills-root>/m-story-breakdown/`, where `<skills-root>` is the directory this skill was loaded from). The board provider's MCP must be reachable; a project `.mcp.json` wins over global MCP config.
 
 ---
 
-## Phase -1 — Load Config
+## Phase -1 — Provider Detection & Config
+
+**Provider detection — delegate to `m-board`:** run its detection order (this skill's `config.json` `"provider"` key → ToolSearch discovery of the session's board tools → ask the user once), then read `m-board/providers/<provider>.md` for the concrete tool names used in Phases 1–6. If no board tools are reachable: `Board MCP not loaded (Jira or Azure DevOps) — add it to your project or global MCP config` and stop.
 
 Resolve config by trying in order, stopping at the first hit (Read each; on error, next):
 
@@ -26,12 +28,13 @@ Resolve config by trying in order, stopping at the first hit (Read each; on erro
 
 A "skills root" is a directory containing the `m-*` skill folders — project-local (e.g. `<project>/.devin/skills`, `<project>/.claude/skills`) or global (e.g. `~/.config/devin/skills`); `<skill-dir>` is the folder this SKILL.md was loaded from.
 
-Announce the resolved source once. If only the example was found, tell the user once to copy it to `config.json` and customise. If the Atlassian MCP tools are missing: `Atlassian MCP not loaded — add it to your project or global MCP config` and stop.
+Announce the resolved source once. If only the example was found, tell the user once to copy it to `config.json` and customise.
 
 **Config shape** (see `config.example.json`):
 
 ```json
 {
+  "provider": "jira",                     // "jira" | "ado" — skips m-board detection
   "defaultProject": "PROJ",
   "defaultIssueType": "Task",             // fallback when intent is ambiguous
   "parentLinkage": "parent",              // "parent" | "link"
@@ -54,8 +57,8 @@ Announce the resolved source once. If only the example was found, tell the user 
 
 Detect the **entry mode** first:
 
-- **Mode A — parent exists:** the user gave an issue key (or a link).
-- **Mode B — no parent yet:** the user gave a feature description, spec, plan, or task list with no Jira key → this skill will **offer to create the parent first** (Phase 1).
+- **Mode A — parent exists:** the user gave a ticket key/id (or a link).
+- **Mode B — no parent yet:** the user gave a feature description, spec, plan, or task list with no ticket key → this skill will **offer to create the parent first** (Phase 1).
 
 Produce this block immediately, then **stop and wait for user confirmation**:
 
@@ -163,6 +166,8 @@ Present the full proposed list in one compact numbered block — **type, stack, 
 
 Track one todo per ticket + one for linking with your todo tool; flip as you go.
 
+*(Calls below show the Jira surface. On ADO, map via `m-board/providers/ado.md`: create work items with fields set directly, parent via hierarchy link, type per the project's process template.)*
+
 **Pre-flight — project-required custom fields** (per-Jira-project): do ONE validation create (or `validate_only: true` batch) to surface what this project requires; discover field IDs via `jira_search_fields` once, cache for the turn. Unclear required value → **stop and ask**.
 
 **Preferred path (supports parent): one `jira_create_issue` per ticket.**
@@ -211,12 +216,13 @@ Ask once whether to draft a test plan from the parent's AC via a test-plan skill
 
 ## Never Do
 
-- Create any Jira issue before its user gate (Phase 1 for the parent, Phase 4 for children).
+- Create any ticket before its user gate (Phase 1 for the parent, Phase 4 for children).
 - Slice without the Phase 2 assessment — recommending NO breakdown is a first-class outcome.
 - Invent acceptance criteria, endpoints, or scope not in the source input.
 - Give every ticket one blanket issue type — type follows the intent table; flag ambiguity instead of guessing.
 - Skip the `[Stack]` prefix on a developer ticket, put two stacks in one ticket, or stack-tag a Story.
-- Pass `additional_fields` as an object — it's a JSON **string**; or use `Sub-task` (hyphen) — it's `Subtask`.
-- Use `jira_batch_create_issues` for Subtasks or when parent must be set at creation.
+- (Jira) Pass `additional_fields` as an object — it's a JSON **string**; or use `Sub-task` (hyphen) — it's `Subtask`.
+- (Jira) Use `jira_batch_create_issues` for Subtasks or when parent must be set at creation.
 - Loop-retry a failing create without changing input — surface the error and stop.
-- Read Jira via a CLI — the Atlassian MCP tools only.
+- Read the board via a CLI — provider MCP tools only (see `m-board/providers/<provider>.md`).
+- Skip m-board provider detection or assume Jira when ADO tools are what's loaded.

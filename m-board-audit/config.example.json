@@ -1,0 +1,20 @@
+{
+  "_comment": "OPTIONAL — everything here is auto-discovered at runtime when absent; copy to config.json only to pin a provider or override a discovered value. provider: 'jira' or 'ado' (skips detection). ADO users set provider 'ado' plus org and project. statusBuckets remaps nuanced statuses/states into the three audit buckets. All values below are placeholders.",
+  "provider": "jira",
+  "org": null,
+  "project": "PROJ",
+  "boardId": null,
+  "components": [],
+  "sprintField": null,
+  "epicLinkField": null,
+  "storyPointsField": null,
+  "sprintPolicy": { "maxActive": 1, "maxPlanned": 1, "lengthWeeks": 2 },
+  "fixVersionScheme": null,
+  "highPriorityNames": [],
+  "staleDays": 90,
+  "statusBuckets": {
+    "todo": [],
+    "inProgress": [],
+    "done": []
+  }
+}

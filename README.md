@@ -70,9 +70,15 @@ You drive it by talking to Devin CLI. Each phase is a skill (`m-sdd`, `m-sdd-spe
 
 The SDD pipeline can be installed into any project for use with tools other than Devin CLI — Claude Code, Cursor, Windsurf, or any tool that reads `AGENTS.md`.
 
-Run this after the global install:
+**Claude Code global install:** unlike Cursor/Windsurf/AGENTS.md, Claude Code has its own global skills directory, so you can skip the per-project step entirely:
 ```bash
-# Claude Code
+bash install.sh --tool claude
+```
+This symlinks all `m-*` skills into `~/.claude/skills/` — available in every Claude Code project on your machine, same no-clobber behavior as the Devin global install. Re-run anytime to pick up new/updated skills; restart Claude Code (or start a new session) to load them.
+
+For everything else — or if you want the SDD pipeline adapter (`.claude/CLAUDE.md`) and `.sdd/pipeline.md` wired into a specific project — run this after the global install:
+```bash
+# Claude Code (per-project adapter + skills)
 bash install.sh --tool claude --project /path/to/your-project
 
 # Cursor

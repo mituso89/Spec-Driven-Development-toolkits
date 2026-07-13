@@ -5,6 +5,9 @@
 #   bash install.sh
 #     → Global Devin install: symlink all m-* skills into ~/.config/devin/skills/
 #
+#   bash install.sh --tool claude
+#     → Global Claude Code install: symlink all m-* skills into ~/.claude/skills/
+#
 #   bash install.sh --quality --project <path>
 #     → Copy quality companion skills into <path>/.devin/skills/
 #
@@ -29,10 +32,11 @@ while [[ $# -gt 0 ]]; do
   esac
 done
 
-# Validate: --tool and --quality require --project
-if [ -n "$TOOL_NAME" ] && [ -z "$PROJECT_DIR" ]; then
+# Validate: --tool requires --project, except `--tool claude` alone which
+# means "global Claude Code install" (mirrors the no-args Devin global install).
+if [ -n "$TOOL_NAME" ] && [ -z "$PROJECT_DIR" ] && [ "$TOOL_NAME" != "claude" ]; then
   echo "Error: --tool requires --project <path>."
-  echo "Example: bash install.sh --tool claude --project /path/to/your-project"
+  echo "Example: bash install.sh --tool cursor --project /path/to/your-project"
   exit 1
 fi
 if [ "$INSTALL_QUALITY" -eq 1 ] && [ -z "$PROJECT_DIR" ]; then
@@ -56,6 +60,22 @@ if [ -z "$PROJECT_DIR" ] && [ -z "$TOOL_NAME" ]; then
     echo "linked $name"
   done
   echo "Done. Restart Devin CLI or re-scan skills if needed."
+fi
+
+# Global Claude Code install — only when --tool claude given without --project
+if [ "$TOOL_NAME" = "claude" ] && [ -z "$PROJECT_DIR" ]; then
+  DEST="$HOME/.claude/skills"
+  mkdir -p "$DEST"
+  for d in "$SRC"/m-*; do
+    [ -d "$d" ] || continue
+    name="$(basename "$d")"
+    if [ -e "$DEST/$name" ] && [ ! -L "$DEST/$name" ]; then
+      echo "skip $name (your own real skill — left untouched)"; continue
+    fi
+    ln -sfn "$d" "$DEST/$name"
+    echo "linked $name"
+  done
+  echo "Done. Restart Claude Code or reload skills if needed."
 fi
 
 # --quality: copy quality companion skills into the right skills dir for the target tool
@@ -87,7 +107,7 @@ m-debugging-and-error-recovery m-api-and-interface-design m-frontend-ui-engineer
 fi
 
 # --tool without --quality: copy ALL m-* skills into the project's skills dir
-if [ -n "$TOOL_NAME" ] && [ "$INSTALL_QUALITY" -eq 0 ]; then
+if [ -n "$TOOL_NAME" ] && [ -n "$PROJECT_DIR" ] && [ "$INSTALL_QUALITY" -eq 0 ]; then
   case "$TOOL_NAME" in
     claude)            ALL_SKILLS_DEST="$PROJECT_DIR/.claude/skills" ;;
     cursor|windsurf)   ALL_SKILLS_DEST="$PROJECT_DIR/.cursor/skills" ;;
@@ -109,7 +129,7 @@ if [ -n "$TOOL_NAME" ] && [ "$INSTALL_QUALITY" -eq 0 ]; then
 fi
 
 # --tool: write a non-Devin adapter + .sdd/pipeline.md into a target project
-if [ -n "$TOOL_NAME" ]; then
+if [ -n "$TOOL_NAME" ] && [ -n "$PROJECT_DIR" ]; then
   # Map tool name to target file path
   case "$TOOL_NAME" in
     claude)   ADAPTER_REL=".claude/CLAUDE.md" ;;

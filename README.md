@@ -73,6 +73,7 @@ The SDD pipeline can be installed into any project for use with tools other than
 **Claude Code global install:** unlike Cursor/Windsurf/AGENTS.md, Claude Code has its own global skills directory, so you can skip the per-project step entirely:
 ```bash
 bash install.sh --tool claude
+# add --quality to link only the five quality companion skills
 ```
 This symlinks all `m-*` skills into `~/.claude/skills/` — available in every Claude Code project on your machine, same no-clobber behavior as the Devin global install. Re-run anytime to pick up new/updated skills; restart Claude Code (or start a new session) to load them.
 

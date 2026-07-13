@@ -7,6 +7,7 @@
 #
 #   bash install.sh --tool claude
 #     → Global Claude Code install: symlink all m-* skills into ~/.claude/skills/
+#       (add --quality to link only the quality companion skills)
 #
 #   bash install.sh --quality --project <path>
 #     → Copy quality companion skills into <path>/.devin/skills/
@@ -32,19 +33,49 @@ while [[ $# -gt 0 ]]; do
   esac
 done
 
-# Validate: --tool requires --project, except `--tool claude` alone which
-# means "global Claude Code install" (mirrors the no-args Devin global install).
-if [ -n "$TOOL_NAME" ] && [ -z "$PROJECT_DIR" ] && [ "$TOOL_NAME" != "claude" ]; then
-  echo "Error: --tool requires --project <path>."
-  echo "Example: bash install.sh --tool cursor --project /path/to/your-project"
+# Validate: --tool and --quality require --project (except claude, which
+# supports a global install into ~/.claude/skills/)
+if [ -n "$TOOL_NAME" ] && [ "$TOOL_NAME" != "claude" ] && [ -z "$PROJECT_DIR" ]; then
+  echo "Error: --tool $TOOL_NAME requires --project <path>."
+  echo "Example: bash install.sh --tool $TOOL_NAME --project /path/to/your-project"
   exit 1
 fi
-if [ "$INSTALL_QUALITY" -eq 1 ] && [ -z "$PROJECT_DIR" ]; then
+if [ "$INSTALL_QUALITY" -eq 1 ] && [ -z "$PROJECT_DIR" ] && [ "$TOOL_NAME" != "claude" ]; then
   echo "Error: --quality requires --project <path>."
   echo "Example: bash install.sh --quality --project /path/to/your-project"
   exit 1
 fi
 SRC="$(cd "$(dirname "$0")" && pwd)"
+
+QUALITY_SKILLS="m-security-and-hardening m-performance-optimization \
+m-debugging-and-error-recovery m-api-and-interface-design m-frontend-ui-engineering"
+
+# Global Claude Code install — --tool claude without --project
+if [ "$TOOL_NAME" = "claude" ] && [ -z "$PROJECT_DIR" ]; then
+  DEST="$HOME/.claude/skills"
+  mkdir -p "$DEST"
+  if [ "$INSTALL_QUALITY" -eq 1 ]; then
+    echo "Installing quality companion skills globally into $DEST"
+    SKILL_DIRS=""
+    for skill in $QUALITY_SKILLS; do SKILL_DIRS="$SKILL_DIRS $SRC/$skill"; done
+  else
+    echo "Installing all skills globally into $DEST"
+    SKILL_DIRS="$SRC"/m-*
+  fi
+  for d in $SKILL_DIRS; do
+    name="$(basename "$d")"
+    if [ ! -d "$d" ]; then
+      echo "  WARN $name not found in toolkit — run vendor.sh first"; continue
+    fi
+    if [ -e "$DEST/$name" ] && [ ! -L "$DEST/$name" ]; then
+      echo "  skip $name (your own real skill — left untouched)"; continue
+    fi
+    ln -sfn "$d" "$DEST/$name"
+    echo "  linked $name"
+  done
+  echo "Done. Restart Claude Code to load the skills."
+  exit 0
+fi
 
 # Global Devin install — only when no --project or --tool flag given
 if [ -z "$PROJECT_DIR" ] && [ -z "$TOOL_NAME" ]; then
@@ -62,26 +93,8 @@ if [ -z "$PROJECT_DIR" ] && [ -z "$TOOL_NAME" ]; then
   echo "Done. Restart Devin CLI or re-scan skills if needed."
 fi
 
-# Global Claude Code install — only when --tool claude given without --project
-if [ "$TOOL_NAME" = "claude" ] && [ -z "$PROJECT_DIR" ]; then
-  DEST="$HOME/.claude/skills"
-  mkdir -p "$DEST"
-  for d in "$SRC"/m-*; do
-    [ -d "$d" ] || continue
-    name="$(basename "$d")"
-    if [ -e "$DEST/$name" ] && [ ! -L "$DEST/$name" ]; then
-      echo "skip $name (your own real skill — left untouched)"; continue
-    fi
-    ln -sfn "$d" "$DEST/$name"
-    echo "linked $name"
-  done
-  echo "Done. Restart Claude Code or reload skills if needed."
-fi
-
 # --quality: copy quality companion skills into the right skills dir for the target tool
 if [ "$INSTALL_QUALITY" -eq 1 ]; then
-  QUALITY_SKILLS="m-security-and-hardening m-performance-optimization \
-m-debugging-and-error-recovery m-api-and-interface-design m-frontend-ui-engineering"
   # Route to the correct skills directory based on the target tool
   case "$TOOL_NAME" in
     claude)            PROJ_DEST="$PROJECT_DIR/.claude/skills" ;;

@@ -1,6 +1,6 @@
 ---
 name: m-brainstorming
-description: "Collaborative design dialogue that turns a feature idea into an approved, committed design/spec before implementation. Use before creating features, building components, or adding functionality that lacks a written design. For quick inline shaping or advice, use m-ask instead. Triggers: brainstorm, design a feature, new feature, flesh out requirements, design before building."
+description: "Collaborative design dialogue that turns a feature idea into an approved, committed design/spec before implementation, in a project WITHOUT the SDD pipeline. If .sdd/ exists, the committed-spec path is m-sdd (m-ask routes this); do not use this skill there. For quick inline shaping or advice, use m-ask instead. Triggers: brainstorm, design a feature, new feature, flesh out requirements, design before building."
 ---
 
 # Brainstorming Ideas Into Designs

@@ -33,8 +33,12 @@ GO gate between planning and code.
     implementation changed the scope.) Target shape: ticket In Progress + a
     `QA Test Plan — <KEY>` comment with `TC-FUNC-*` / `TC-REG-*` cases.
 - **Assemble the context pack (load-bearing — this is where quality is set).** Gather the
-  three grounding inputs and pass them verbatim into **every** delegated subagent below; do
-  not let an implementer work blind:
+  three grounding inputs below, then **slice per delegation — never dump verbatim**: each
+  subagent gets only what its task needs (the current task's text, the acceptance criteria
+  it satisfies, the constitution rules it touches) plus **paths** to the full artifacts to
+  read on demand. Pasting spec+plan+tasks into every prompt multiplies input tokens per
+  subagent without adding grounding; an implementer working blind is the other failure mode —
+  the slice must still cover its task completely:
   - **Code quality →** `.sdd/constitution.md` (allowed/banned patterns, conventions). If it
     doesn't exist, recommend `m-sdd-constitution` first — without it there is no quality bar.
   - **Project knowledge →** `.sdd/knowledge.md` + host `CLAUDE.md` (file map, domain glossary,
@@ -54,10 +58,11 @@ GO gate between planning and code.
 
 - Isolate first: create a feature branch/worktree via **m-worktree**.
 - Delegate the build to **m-subagent-driven-development** (fresh subagent per task, review
-  between tasks), feeding it the **Phase 0 context pack** so each implementer reuses real
-  symbols/paths and obeys the constitution instead of inventing. For a single linear plan,
-  **m-executing-plans** is the lighter alternative. Do **not** modify the delegated skill —
-  pass context into it.
+  between tasks), feeding each implementer its **slice of the Phase 0 context pack** (per the
+  slicing rule above) so it reuses real symbols/paths and obeys the constitution instead of
+  inventing. Do **not** modify the delegated skill — pass context into it. Do tell it to
+  **return here when its tasks are complete instead of running its own finishing handoff** —
+  finalization happens in Phase 5, after test/verify/review.
 
 ## Phase 2 — Test
 
@@ -75,9 +80,11 @@ GO gate between planning and code.
 ## Phase 4 — Review
 
 - Run review by a **fresh perspective**, not the author, and grade against the Phase 0 pack
-  on both axes: **code quality** (run the `code-review` skill for correctness bugs +
-  `m-requesting-code-review` against `.sdd/constitution.md`) and **business correctness**
-  (does it satisfy every acceptance criterion / `TC-*` case?). A finding on either axis
+  on both axes: **code quality** (run the `code-review` skill for correctness bugs) and
+  **business correctness** (does it satisfy every acceptance criterion / `TC-*` case?). Add
+  `m-requesting-code-review` against `.sdd/constitution.md` **only if the Phase 1 delegate
+  didn't already run per-task + whole-feature quality reviews** (m-subagent-driven-development
+  does — don't re-run the same reviewer template a third time). A finding on either axis
   blocks merge.
 - Process the feedback with **m-receiving-code-review** — verify each point technically
   rather than agreeing reflexively; loop back to Phase 1–2 for any real fix, then re-verify.
@@ -96,9 +103,10 @@ GO gate between planning and code.
   Phase 3 while tests are red, no "done" without the Phase 3 running-app check.
 - Hard-code transition/state ids — always discover them per board and step through hops.
 - Start implementing when the ticket has no test plan and one could be generated first.
-- Let a subagent implement or review without the Phase 0 context pack, or accept a self-review
-  — the pack (constitution + knowledge + acceptance criteria) IS the quality control, and the
-  reviewer must be an independent perspective grading against it.
+- Let a subagent implement or review without its slice of the Phase 0 context pack, or accept
+  a self-review — the pack (constitution + knowledge + acceptance criteria) IS the quality
+  control, and the reviewer must be an independent perspective grading against it. Slicing
+  trims tokens, not grounding: "relevant slice + paths" never means "no context".
 - Re-implement anything a sibling skill owns — this orchestrator only gates and sequences.
 - Invoke this **directly** mid-SDD — enter through `m-sdd-implement`, which drives this engine
   (and passes the SDD context pack + a pre-gated flag). Being *called by* SDD is expected.

@@ -79,7 +79,8 @@ enumerated and routed to a user-chosen destination (backlog or active sprint). N
 
 ## Phase 2 — Health report + cleanup plan
 
-Emit one report (chat; offer to save to `docs/specs/YYYY-MM-DD-<project>-board-audit.md`):
+Emit one report (chat; offer to save to `docs/reports/YYYY-MM-DD-<project>-board-audit.md` — a
+report, not a spec: keep it out of `docs/specs/` and `specs/`):
 a `SUMMARY` line, one row per failing check (icon · count · action), then an **ordered, reversible-first**
 `PROPOSED CLEANUP PLAN`. Tag every step:
 

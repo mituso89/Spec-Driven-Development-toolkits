@@ -10,11 +10,11 @@ substitute it in every `<skills-root>/…` path below and in the phase skills.
 
 ## Rule 1 — Delegate, don't hand-roll
 Where a phase names a delegate skill (plan→`m-writing-plans`,
-implement→`m-subagent-driven-development`, tasks-to-issues→`m-story-breakdown`,
-etc.) — use it; hand-rolling what a skill already covers is a failure. Do **not**
-run `skill` (search) to "confirm" a delegate that is already named — that is wasted
-ceremony. Run `skill` (search) only when the named delegate is missing/uninstalled
-and you need a substitute.
+implement→`m-implement` (the engine, which drives `m-subagent-driven-development`),
+tasks-to-issues→`m-story-breakdown`, etc.) — use it; hand-rolling what a skill
+already covers is a failure. Do **not** run `skill` (search) to "confirm" a
+delegate that is already named — that is wasted ceremony. Run `skill` (search)
+only when the named delegate is missing/uninstalled and you need a substitute.
 
 **Self-contained exceptions** (deliberately *not* delegated — their natural
 delegate's spine would fight the phase contract): `specify` and `clarify` both

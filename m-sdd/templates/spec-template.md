@@ -9,8 +9,10 @@
   BANNED here (they belong in plan.md): tech stack, languages, frameworks,
   APIs, endpoints, database/schema design, code structure, library choices.
   Unknowns: make an informed guess and record it under Assumptions; only for
-  decisions that genuinely change scope, insert at most 3
-  `[NEEDS CLARIFICATION: <specific question>]` markers in place.
+  decisions that genuinely change scope, insert at most 3 inline clarification
+  markers (exact `[NEEDS …]` syntax defined in m-sdd-specify). DELETE this whole
+  comment block before requesting approval — the approval gate greps the entire
+  file, comments included, for leftover marker text.
 -->
 
 ## Problem & Goal

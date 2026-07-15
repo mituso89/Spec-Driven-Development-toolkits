@@ -1,6 +1,6 @@
 ---
 name: m-sdd-knowledge
-description: "SDD knowledge base — build .sdd/knowledge.md, a project-level index of facts/pointers (stack profile, file map, domain glossary, doc links, decisions) that specify and clarify read for grounding. Distinct from the constitution (rules). Triggers: sdd knowledge, knowledge base, project facts, sdd context, build knowledge, project glossary, ground specify, knowledge.md, sdd memory."
+description: "Build .sdd/knowledge.md — project facts index (stack profile, file map, glossary, doc links, decisions) grounding specify/clarify/plan. Triggers: sdd knowledge, knowledge base."
 ---
 
 # SDD — Knowledge Base

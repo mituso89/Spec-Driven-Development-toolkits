@@ -1,6 +1,6 @@
 ---
 name: m-sdd-implement
-description: "SDD phase 7 — the SDD adapter around the m-implement engine: gate on tasks+analyze, human GO, then delegate the implement→test→verify→review→finalize loop to m-implement, and record/route the SDD state. Triggers: sdd implement, execute sdd plan, build the feature sdd, run sdd tasks, implement sdd."
+description: "SDD phase 7 — gate on tasks+analyze and a human GO, then delegate the build loop to m-implement and record SDD state. Routed by m-sdd."
 ---
 
 # SDD — Implement

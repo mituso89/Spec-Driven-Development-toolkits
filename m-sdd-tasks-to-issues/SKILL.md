@@ -1,6 +1,6 @@
 ---
 name: m-sdd-tasks-to-issues
-description: "SDD phase 8 (optional) — push the feature's tasks.md to Jira as linked dev tickets by delegating to m-story-breakdown. Triggers: sdd tasks to issues, sdd to jira, create tickets from tasks, sdd issues, push sdd tasks to jira."
+description: "SDD phase 8 (optional) — push the feature's tasks.md to the board as linked dev tickets via m-story-breakdown. Routed by m-sdd."
 ---
 
 # SDD — Tasks → Issues

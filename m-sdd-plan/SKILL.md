@@ -1,6 +1,6 @@
 ---
 name: m-sdd-plan
-description: "SDD phase 4 — produce the technical implementation plan by delegating to the m-writing-plans skill, writing specs/<id>/plan.md (+ research/data-model/contracts). Triggers: sdd plan, write sdd plan, plan feature sdd, implementation plan sdd, technical plan."
+description: "SDD phase 4 — technical implementation plan via m-writing-plans, written to specs/<id>/plan.md (+ research/data-model/contracts). Routed by m-sdd."
 ---
 
 # SDD — Plan

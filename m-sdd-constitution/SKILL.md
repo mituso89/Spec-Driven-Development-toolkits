@@ -1,6 +1,6 @@
 ---
 name: m-sdd-constitution
-description: "SDD phase 1 — establish project principles, conventions, and guardrails that gate every later phase. Writes .sdd/constitution.md. Triggers: sdd constitution, project constitution, sdd principles, define guardrails, project conventions doc, establish standards."
+description: "SDD phase 1 — establish project principles, conventions, and guardrails in .sdd/constitution.md. Invoked by name or routed by m-sdd."
 ---
 
 # SDD — Constitution

@@ -1,6 +1,6 @@
 ---
 name: m-sdd-tasks
-description: "SDD phase 5 — normalize the plan's bite-sized steps into an ordered specs/<id>/tasks.md checklist. Triggers: sdd tasks, generate tasks sdd, task breakdown sdd, tasks from plan, sdd task list."
+description: "SDD phase 5 — normalize the plan's steps into an ordered specs/<id>/tasks.md checklist. Routed by m-sdd."
 ---
 
 # SDD — Tasks

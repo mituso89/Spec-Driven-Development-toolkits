@@ -1,6 +1,6 @@
 ---
 name: m-sdd-analyze
-description: "SDD phase 6 (optional gate) — cross-check constitution, spec, plan, and tasks for consistency and coverage before implementation; writes specs/<id>/analysis.md. Triggers: sdd analyze, consistency check sdd, validate spec plan tasks, sdd gate, pre-implementation review."
+description: "SDD phase 6 (optional gate) — cross-check constitution, spec, plan, and tasks for consistency before implementation; writes specs/<id>/analysis.md. Routed by m-sdd."
 ---
 
 # SDD — Analyze

@@ -1,6 +1,6 @@
 ---
 name: m-sdd-specify
-description: "SDD phase 2 — turn a feature idea into an approved REQUIREMENT spec (what/why, PO-readable, no tech detail) through a convergent requirement-capture interview, writing specs/<id>/spec.md. Triggers: sdd specify, write sdd spec, specify feature, sdd spec, start spec, define requirements sdd, write requirements, feature spec for product owner, PO spec, requirement spec."
+description: "SDD phase 2 — requirement-capture interview producing an approved, PO-readable spec (what/why, no tech) at specs/<id>/spec.md. Routed by m-sdd."
 ---
 
 # SDD — Specify

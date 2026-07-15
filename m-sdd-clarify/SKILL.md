@@ -1,6 +1,6 @@
 ---
 name: m-sdd-clarify
-description: "SDD phase 3 (optional) — resolve ambiguities in the spec by interviewing the user, appending a Clarifications section to specs/<id>/spec.md. Triggers: sdd clarify, clarify spec, resolve ambiguities, sdd questions, tighten spec."
+description: "SDD phase 3 (optional) — interview the user to resolve spec ambiguities, appending a Clarifications section to specs/<id>/spec.md. Routed by m-sdd."
 ---
 
 # SDD — Clarify

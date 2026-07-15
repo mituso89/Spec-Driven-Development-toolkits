@@ -1,6 +1,6 @@
 ---
 name: m-sdd-checklist
-description: "SDD optional quality gate — per-domain requirement-quality checklists ('unit tests for English') that test the spec's wording, not the implementation. Writes specs/<id>/checklists/<domain>.md. Triggers: sdd checklist, spec checklist, requirements quality, unit tests for english, requirement checklist, spec quality check, checklist the spec."
+description: "SDD optional quality gate — per-domain requirement-quality checklists ('unit tests for English') testing the spec's wording, not the implementation. Triggers: sdd checklist, spec checklist."
 ---
 
 # SDD — Checklist (optional, untracked)

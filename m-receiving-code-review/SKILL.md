@@ -1,6 +1,6 @@
 ---
 name: m-receiving-code-review
-description: "Evaluates code-review feedback with technical verification before implementing — no performative agreement, no blind implementation. Use when receiving review comments, especially unclear or questionable ones. Triggers: address review comments, PR feedback, reviewer said, fix review items."
+description: "Process code-review feedback with technical verification of each point — no reflexive agreement, no blind implementation. Invoked by m-implement Phase 4."
 ---
 
 # Code Review Reception

@@ -6,7 +6,7 @@ SRC="$HOME/.config/devin/skills"
 DEST="$(cd "$(dirname "$0")" && pwd)"
 
 # Upstream skills -> vendored as m-<name>
-UPSTREAM="brainstorming writing-plans executing-plans subagent-driven-development \
+UPSTREAM="brainstorming writing-plans subagent-driven-development \
 finishing-a-development-branch using-git-worktrees test-driven-development \
 requesting-code-review receiving-code-review"
 # Already-m skills -> vendored as-is (own names)

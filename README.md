@@ -199,7 +199,7 @@ The pipeline's delegates are vendored here (vendored upstream skills gain an `m-
 | clarify | — self-contained (ambiguity interview of the user; the user decides, not the codebase) |
 | checklist (optional) | — self-contained (`m-sdd-checklist`, spec-kit `/speckit.checklist` parity) |
 | plan | `m-writing-plans` |
-| implement | `m-implement` (orchestrator engine) → `m-subagent-driven-development` (or `m-executing-plans`), `m-worktree`, `m-finishing-a-development-branch`, `m-git-commit` |
+| implement | `m-implement` (orchestrator engine) → `m-subagent-driven-development`, `m-worktree`, `m-finishing-a-development-branch`, `m-git-commit` |
 | tasks-to-issues | `m-story-breakdown` (+ board MCP — Jira or Azure DevOps, detected via `m-board`) |
 | quality companions (optional) | `m-security-and-hardening`, `m-performance-optimization`, `m-debugging-and-error-recovery`, `m-api-and-interface-design`, `m-frontend-ui-engineering` |
 

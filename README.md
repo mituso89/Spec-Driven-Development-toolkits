@@ -145,6 +145,7 @@ Each phase reads the previous artifact and writes the next. **Bold** phases belo
 **0. Start / check status — `m-sdd`**
 > *"Start SDD"* or *"what phase am I in?"*
 Scaffolds `.sdd/` + `specs/` in your project, creates or selects a feature, and shows the pipeline status with the next step. Run it anytime to re-orient.
+*Brand-new or un-onboarded repo?* Run `m-init` first — it detects which tool reads the repo (Devin CLI, Claude Code, Cursor, Windsurf, or plain `AGENTS.md`), writes a grounded project brief and rules files, scaffolds the code itself if the repo is empty, and then hands `.sdd/` to `m-sdd`.
 
 **1. Constitution (once per project) — `m-sdd-constitution`**
 Establishes your project's principles, conventions, and guardrails (stack, testing policy, naming…). Written to `.sdd/constitution.md`; every later phase is checked against it. You approve it.
@@ -195,6 +196,7 @@ The pipeline's delegates are vendored here (vendored upstream skills gain an `m-
 
 | Phase | Delegates to (bundled) |
 |---|---|
+| bootstrap (optional, pre-pipeline) | `m-init` — detects your tool (Devin/Claude/Cursor/Windsurf/AGENTS.md), writes the project brief + rules files, then hands `.sdd/` scaffolding to `m-sdd` |
 | specify | — self-contained (convergent requirement-capture interview; optional upstream brainstorm via `m-ask`) |
 | clarify | — self-contained (ambiguity interview of the user; the user decides, not the codebase) |
 | checklist (optional) | — self-contained (`m-sdd-checklist`, spec-kit `/speckit.checklist` parity) |
@@ -218,6 +220,7 @@ sdd-toolkit/
     test_sdd_lib.sh          # dual bash+zsh unit suite
     _shared.md               # cross-cutting rules (delegate, constitution, HITL gates)
     templates/               # constitution / knowledge / spec / plan / tasks / checklist / design
+  m-init/                    # optional pre-pipeline bootstrap: project brief + rules files
   m-sdd-<phase>/SKILL.md     # one folder per pipeline phase
   docs/                      # design notes, plans, audits
 ```

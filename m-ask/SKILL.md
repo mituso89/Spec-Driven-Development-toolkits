@@ -25,6 +25,7 @@ Generic advice without project context is worse than no advice. Every claim abou
 | **Why broken** | "Why is X broken" | → `m-debugging-and-error-recovery` |
 | **Implement** | "Build / add X" | → **Intent triage** below |
 | **Ticket** | ticket key/id, ticket URL, "look at this ticket" | Fetch it → **Intent triage** below |
+| **Bootstrap** | "init this repo", "onboard this codebase", "start a new project" — or Phase 1 finds no project brief at all | → `m-init` |
 | **Review** | "Is this ready" | → `m-requesting-code-review` |
 
 For debug/review intents, hand off to the project's matching skill if one exists; otherwise proceed but say you're answering directly. Build/design/spec intents go through the triage below — never straight to a skill by keyword.
@@ -127,7 +128,7 @@ Used in:   [file:line]
 
 ## Phase 4 — Route
 
-End with one concrete next step. For build/design/spec intents the Phase 0 triage decides: the SDD pipeline (`m-sdd`, or `m-sdd-specify` for a new feature's spec), `m-brainstorming` (non-SDD design doc), or `m-implement` (scoped build — pass the ticket key if there is one). Otherwise: a debug skill (`m-debugging-and-error-recovery`), a review skill (`m-requesting-code-review`), or "Done — no further action."
+End with one concrete next step. For build/design/spec intents the Phase 0 triage decides: the SDD pipeline (`m-sdd`, or `m-sdd-specify` for a new feature's spec), `m-brainstorming` (non-SDD design doc), or `m-implement` (scoped build — pass the ticket key if there is one). Otherwise: a debug skill (`m-debugging-and-error-recovery`), a review skill (`m-requesting-code-review`), `m-init` (bootstrap the agent-facing layer — offer it whenever Phase 1 found no project brief and you had to infer the stack), or "Done — no further action."
 
 ---
 

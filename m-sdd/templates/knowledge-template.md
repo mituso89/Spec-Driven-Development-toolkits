@@ -6,6 +6,12 @@
 ## Stack profile
 <framework · language + strictness · package manager · test runner · data layer — one paragraph>
 
+## Verification gate
+<The single "prove it works" command and what passing means — e.g.
+`npm run verify` (lint + tests + live smoke) exits 0. This is the project's
+"eyes": implement names it in the GO summary and runs it before claiming done.
+If none exists yet, say so — a fake gate is worse than none.>
+
 ## Map (pointers — do not duplicate)
 - Architecture: <ARCHITECTURE.md §x / docs link>
 - Key modules: <path — responsibility>   (file or file:line pointers)

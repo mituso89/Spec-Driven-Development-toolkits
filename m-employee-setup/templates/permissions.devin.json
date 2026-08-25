@@ -1,0 +1,85 @@
+{
+  "read_config_from": {
+    "claude": true
+  },
+
+  "permissions": {
+    "allow": [
+      "Read(src/**)",
+      "Read(test/**)",
+      "Read(tests/**)",
+      "Read(docs/**)",
+      "Read(specs/**)",
+      "Read(.sdd/**)",
+      "Exec(git status)",
+      "Exec(git diff)",
+      "Exec(git log)",
+      "Exec(git branch)",
+      "Exec(ls)",
+      "Exec(npm test)",
+      "Exec(npm run lint)",
+      "Exec(npm run verify)"
+    ],
+
+    "ask": [
+      "Write(src/**)",
+      "Write(test/**)",
+      "Write(tests/**)",
+      "Write(specs/**)",
+      "Write(.sdd/**)",
+      "Exec(npm install)",
+      "Exec(git add)",
+      "Exec(git commit)",
+      "Exec(git checkout)",
+      "Exec(git worktree)",
+      "webfetch"
+    ],
+
+    "deny": [
+      "Read(**/.env)",
+      "Read(**/.env.*)",
+      "Read(**/*.pem)",
+      "Read(**/id_rsa*)",
+      "Write(**/.claude/settings.json)",
+      "Write(**/.claude/hooks/**)",
+      "Write(**/.devin/config.json)",
+      "Write(**/.devin/config.local.json)",
+      "Write(**/.devin/hooks/**)",
+      "Write(**/.devin/rules/**)",
+      "Write(**/scripts/agent-hooks/**)",
+      "Write(**/.sdd/state.json)",
+      "Write(**/.sdd/config.json)",
+      "Exec(git push)",
+      "Exec(git reset --hard)",
+      "Exec(git clean)",
+      "Exec(npm publish)",
+      "Exec(rm -rf)",
+      "Exec(sudo)"
+    ]
+  },
+
+  "hooks": {
+    "PreToolUse": [
+      {
+        "matcher": "^(edit|write)$",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "\"$DEVIN_PROJECT_DIR/scripts/agent-hooks/protect-paths.sh\""
+          }
+        ]
+      }
+    ],
+    "PostToolUse": [
+      {
+        "matcher": "^(edit|write)$",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "\"$DEVIN_PROJECT_DIR/scripts/agent-hooks/post-edit-check.sh\""
+          }
+        ]
+      }
+    ]
+  }
+}

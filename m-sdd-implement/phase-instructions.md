@@ -10,7 +10,7 @@
 - Read `.sdd/pipeline.md`. If `analyze` is not `done` or `skipped`, stop — never implement on a still-pending/in-progress consistency gate.
 - Load `.sdd/constitution.md`.
 - Load the structural grounding source if present (`.sdd/repo-map.md` or the code index named in `.sdd/knowledge.md`).
-- **Human GO gate — the point of no return into code (load-bearing).** Before writing any code: summarize what will be built (the `tasks.md` list), the target branch, and any open analyze findings the user must own; then get the user's explicit "go". If not confirmed, stop. Do NOT proceed autonomously past this point.
+- **Human GO gate — the point of no return into code (load-bearing).** Before writing any code: summarize what will be built (the `tasks.md` list), the target branch, the **verification gate** that will prove it (the `Verification gate` line in `.sdd/knowledge.md`, e.g. `npm run verify`; if none is recorded, say so), and any open analyze findings the user must own; then get the user's explicit "go". If not confirmed, stop. Do NOT proceed autonomously past this point.
 - Optional companion: if implementation hits unexpected failures or test breakages, use the debugging-and-error-recovery skill for structured root-cause triage before retrying.
 
 ## Phase 1 — Execute
@@ -21,6 +21,6 @@
 
 ## Phase 2 — Finish, record & route
 
-- Verify tests pass. Prepare for merge/PR.
+- Run the **verification gate** from `.sdd/knowledge.md` and confirm it passes (exit 0) — do not claim done on tests alone. Prepare for merge/PR.
 - Update `.sdd/pipeline.md`: set `implement` row to `done`.
 - Route: offer the issues phase if the team tracks work in Jira; otherwise the pipeline is complete.

@@ -15,7 +15,7 @@ description: "SDD phase 7 — gate on tasks+analyze and a human GO, then delegat
 - `source <skills-root>/m-sdd/sdd-lib.sh; root="$(pwd)"; id="$(sdd_active_feature "$root")"`
 - `sdd_require "$root" "$id" tasks "done"` — tasks must be derived.
 - `sdd_require "$root" "$id" analyze "done,skipped"` — analyze must have run clean or been explicitly skipped; never implement on a still-`pending`/`in_progress` consistency gate.
-- **Human GO gate — the point of no return into code (load-bearing).** Before writing any code: summarize what will be built (the `tasks.md` list), the target branch/worktree, and any open analyze findings the user must own; then get the user's explicit "go". If not confirmed, stop. Do NOT proceed autonomously past this point. **This is the single GO gate for the run** — the engine in Phase 1 is told it is already gated and must not ask again.
+- **Human GO gate — the point of no return into code (load-bearing).** Before writing any code: summarize what will be built (the `tasks.md` list), the target branch/worktree, the **verification gate** that will prove it (the `Verification gate` line in `.sdd/knowledge.md`, e.g. `npm run verify`; if none is recorded, say so), and any open analyze findings the user must own; then get the user's explicit "go". If not confirmed, stop. Do NOT proceed autonomously past this point. **This is the single GO gate for the run** — the engine in Phase 1 is told it is already gated and must not ask again.
 
 > Optional companion: if implementation hits unexpected failures or test breakages, run `m-debugging-and-error-recovery` for structured root-cause triage before retrying.
 

@@ -1,0 +1,83 @@
+{
+  "$schema": "https://json.schemastore.org/claude-code-settings.json",
+
+  "permissions": {
+    "allow": [
+      "Bash(npm test)",
+      "Bash(npm run lint)",
+      "Bash(npm run verify)",
+      "Bash(git status)",
+      "Bash(git diff:*)",
+      "Bash(git log:*)",
+      "Bash(git branch)",
+      "Bash(ls:*)",
+      "Read(./src/**)",
+      "Read(./test/**)",
+      "Read(./tests/**)",
+      "Read(./docs/**)",
+      "Read(./specs/**)",
+      "Read(./.sdd/**)"
+    ],
+
+    "ask": [
+      "Write(./src/**)",
+      "Edit(./src/**)",
+      "Write(./test/**)",
+      "Edit(./test/**)",
+      "Write(./specs/**)",
+      "Write(./.sdd/**)",
+      "Bash(npm install:*)",
+      "Bash(git add:*)",
+      "Bash(git commit:*)",
+      "Bash(git checkout:*)",
+      "Bash(git worktree:*)",
+      "WebFetch"
+    ],
+
+    "deny": [
+      "Read(./.env)",
+      "Read(./.env.*)",
+      "Read(./**/*.pem)",
+      "Read(./**/id_rsa*)",
+      "Edit(./.claude/settings.json)",
+      "Edit(./.claude/hooks/**)",
+      "Edit(./.devin/config.json)",
+      "Edit(./.devin/hooks/**)",
+      "Edit(./.devin/rules/**)",
+      "Edit(./scripts/agent-hooks/**)",
+      "Edit(./.sdd/state.json)",
+      "Edit(./.sdd/config.json)",
+      "Bash(git push:*)",
+      "Bash(git reset --hard:*)",
+      "Bash(git clean:*)",
+      "Bash(npm publish:*)",
+      "Bash(rm -rf:*)",
+      "Bash(sudo:*)"
+    ]
+  },
+
+  "hooks": {
+    "PreToolUse": [
+      {
+        "matcher": "Edit|Write",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "${CLAUDE_PROJECT_DIR}/scripts/agent-hooks/protect-paths.sh"
+          }
+        ]
+      }
+    ],
+    "PostToolUse": [
+      {
+        "matcher": "Edit|Write",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "${CLAUDE_PROJECT_DIR}/scripts/agent-hooks/post-edit-check.sh"
+          }
+        ]
+      }
+    ]
+  }
+}

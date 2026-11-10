@@ -14,6 +14,12 @@
 <!-- If ../design/ exists, read ../design/README.md and its screens as the visual
      implementation reference — derive components/layouts/states from the mockups. -->
 
+## Phases
+<!-- Shippable slices in build order. Each phase has acceptance criteria with exact,
+     checkable steps in ./acceptance.json (schema: m-sdd/acceptance-schema.md). -->
+- **PH1 - <outcome>:** <what is usable when this phase is done>
+- **PH2 - <outcome>:** <...>
+
 ## Tasks
 <bite-sized checkbox tasks — produced by m-writing-plans. m-sdd-tasks normalizes these
 into ./tasks.md (the canonical, tracked checklist) and replaces this section with:
@@ -32,6 +38,7 @@ into ./tasks.md (the canonical, tracked checklist) and replaces this section wit
   defined, coverage is *expected* (a soft default), not blocking.
 
 ## Companion artifacts
+- acceptance.json - per-phase acceptance criteria with exact steps (always)
 - research.md — <if needed>
 - data-model.md — <if needed>
 - contracts/ — <API/interface contracts, if needed>

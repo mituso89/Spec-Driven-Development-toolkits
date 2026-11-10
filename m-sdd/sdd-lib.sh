@@ -145,6 +145,69 @@ sdd_require() { # <root> <id> <phase> <accepted-csv>  -> returns 1 + stderr if s
   esac
 }
 
+# Acceptance file check - the schema is documented once in acceptance-schema.md.
+# Prints one "acceptance: <problem>" line per problem and returns 1, or prints
+# "acceptance: ok". With <spec.md>, also checks that every US#/FR-###/SC-### in the
+# spec is covered by at least one criterion, and that no criterion covers an unknown ID.
+sdd_validate_acceptance() { # <acceptance.json> [<spec.md>]
+  local file="$1" spec="${2:-}" problems spec_ids
+  [ -f "$file" ] || { printf 'acceptance: file not found: %s\n' "$file"; return 1; }
+  jq -e . "$file" >/dev/null 2>&1 || { printf 'acceptance: not valid JSON: %s\n' "$file"; return 1; }
+  spec_ids="[]"
+  if [ -n "$spec" ]; then
+    [ -f "$spec" ] || { printf 'acceptance: spec not found: %s\n' "$spec"; return 1; }
+    spec_ids="$(grep -oE '(^|[^A-Za-z0-9-])(US[0-9]+|FR-[0-9]+|SC-[0-9]+)' "$spec" \
+      | sed -E 's/^[^A-Z]//' | sort -u | jq -R . | jq -s -c .)"
+  fi
+  problems="$(jq -r --argjson spec_ids "$spec_ids" --arg has_spec "${spec:+1}" '
+    def str: type == "string" and length > 0;
+    def need(cond; msg): if cond then empty else msg end;
+    def dupes(kind): group_by(.) | map(select(length > 1) | "duplicate \(kind) id: \(.[0])") | .[];
+    def check_step(at):
+      if type != "object" then "\(at) must be an object"
+      elif .type == "automated" then need(.run | str; "\(at).run must be the exact command to run")
+      elif .type == "manual" then need(.check | str; "\(at).check must say exactly what to do and look at")
+      else "\(at).type must be \"automated\" or \"manual\"" end,
+      (if type == "object" then need(.expect | str; "\(at).expect must state the pass condition") else empty end);
+    def check_criterion(at):
+      if type != "object" then "\(at) must be an object" else
+        need(.id | str; "\(at).id must be a non-empty string"),
+        need(.description | str; "\(at).description must be a non-empty string"),
+        need((.covers | type) == "array" and all(.covers[]?; str); "\(at).covers must be an array of spec IDs"),
+        (if (.steps | type) == "array" and (.steps | length) > 0
+         then .steps | to_entries[] | .key as $k | .value | check_step("\(at).steps[\($k)]")
+         else "\(at).steps must be a non-empty array" end)
+      end;
+    def check_phase(at):
+      if type != "object" then "\(at) must be an object" else
+        need(.id | str; "\(at).id must be a non-empty string"),
+        need(.description | str; "\(at).description must be a non-empty string"),
+        (if (.acceptance_criteria | type) == "array" and (.acceptance_criteria | length) > 0
+         then .acceptance_criteria | to_entries[] | .key as $k | .value | check_criterion("\(at).acceptance_criteria[\($k)]")
+         else "\(at).acceptance_criteria must be a non-empty array" end)
+      end;
+    if type != "object" then "top level must be an object" else
+      need(.feature | str; "feature must be a non-empty string"),
+      need((.created_at | type) == "string" and (.created_at | test("^[0-9]{4}-[0-9]{2}-[0-9]{2}T[0-9]{2}:[0-9]{2}"));
+           "created_at must be an ISO-8601 date-time, e.g. 2026-01-31T09:00:00Z"),
+      (if (.phases | type) == "array" and (.phases | length) > 0 then
+         (.phases | to_entries[] | .key as $k | .value | check_phase("phases[\($k)]")),
+         ([.phases[] | objects | .id | strings] | dupes("phase")),
+         ([.phases[] | objects | .acceptance_criteria[]? | objects | .id | strings] | dupes("criterion")),
+         (if $has_spec == "1" then
+            ([.phases[] | objects | .acceptance_criteria[]? | objects | .covers[]? | strings] | unique) as $covered
+            | ($spec_ids - $covered | .[] | "spec requirement \(.) is not covered by any criterion"),
+              ($covered - $spec_ids | .[] | "criteria cover \(.), which is not in the spec")
+          else empty end)
+       else "phases must be a non-empty array" end)
+    end' "$file")" || { printf 'acceptance: could not check %s\n' "$file"; return 1; }
+  if [ -n "$problems" ]; then
+    printf '%s\n' "$problems" | sed 's/^/acceptance: /'
+    return 1
+  fi
+  printf 'acceptance: ok\n'
+}
+
 sdd_status() { # <root> -> human-readable pipeline state for active feature
   local root="$1" id p st glyph; id="$(sdd_active_feature "$root")"
   if [ -z "$id" ]; then printf 'No active feature. Ask the m-sdd skill to create one (new "<name>").\n'; return 0; fi

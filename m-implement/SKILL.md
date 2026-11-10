@@ -46,6 +46,14 @@ GO gate between planning and code.
     knowledge is thin, recommend `m-sdd-knowledge`.
   - **Business logic →** the ticket's acceptance criteria + the QA test plan (above) + any
     `specs/<id>/` spec. This is the source of truth for *what correct means*.
+  - **Definition of done →** `specs/<id>/acceptance.json` when it exists (schema and evidence
+    format: `m-sdd/acceptance-schema.md` in the skills folder) - per-phase criteria with exact
+    steps; drives the acceptance gate below.
+- **Research with read-only helpers.** To fill the knowledge slice, dispatch the
+  **m-research-helpers** locator (files/symbols a task touches) and pattern finder (existing
+  examples to copy) when available, and hand implementers their short results (paths, line
+  ranges) instead of reading whole files here - this keeps the main context small. In
+  pre-gated mode, do the same per task in Phase 1 when the caller's pack lacks the paths.
 - **Ambiguity gate.** If the acceptance criteria are unclear or a design decision is
   non-obvious (data shape, edge-case behaviour, which screen), resolve it **before** GO via
   `m-brainstorming` / `m-ask` (or `m-sdd-clarify` in SDD) — never guess business intent.
@@ -63,6 +71,12 @@ GO gate between planning and code.
   inventing. Do **not** modify the delegated skill — pass context into it. Do tell it to
   **return here when its tasks are complete instead of running its own finishing handoff** —
   finalization happens in Phase 5, after test/verify/review.
+- **Acceptance gate per phase (when `acceptance.json` exists - load-bearing).** Hand the
+  delegate one acceptance phase's tasks at a time. When they are complete, run or check every
+  step of every criterion in that phase and write `specs/<id>/evidence/<phase-id>.md` (PASS/FAIL
+  per criterion; per step the command plus an output excerpt, or a screenshot path / exact
+  observation for manual steps). Any FAIL or NOT RUN blocks the phase: fix, re-run the whole
+  phase, overwrite the file. Start the next phase only on an all-PASS file.
 
 ## Phase 2 — Test
 
@@ -76,6 +90,9 @@ GO gate between planning and code.
   walk the **golden path plus at least one edge case** (ideally the top `TC-*` cases from the
   Phase 0 test plan). Type checks and unit tests prove code correctness, not feature
   correctness; this step proves the feature.
+- With `acceptance.json`: re-run every automated acceptance step once on the final code (later
+  phases can break earlier ones) and confirm every evidence file is all-PASS before Phase 4; a
+  failure reopens that phase and its evidence file.
 
 ## Phase 4 — Review
 
@@ -100,7 +117,9 @@ GO gate between planning and code.
 ## Never
 
 - Write code before the user's explicit "go", or advance past a gate before it's met — no
-  Phase 3 while tests are red, no "done" without the Phase 3 running-app check.
+  Phase 3 while tests are red, no "done" without the Phase 3 running-app check, and no phase
+  "done" without an all-PASS evidence file when `acceptance.json` exists.
+- Edit `acceptance.json` to make a failing step pass - a wrong criterion goes back to the plan.
 - Hard-code transition/state ids — always discover them per board and step through hops.
 - Start implementing when the ticket has no test plan and one could be generated first.
 - Let a subagent implement or review without its slice of the Phase 0 context pack, or accept

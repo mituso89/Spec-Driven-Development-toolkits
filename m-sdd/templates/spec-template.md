@@ -18,7 +18,9 @@
 ## Problem & Goal
 <what user/business problem this solves and why now — no implementation detail>
 
-## Non-Goals
+## Non-Goals (out of scope - not building)
+<!-- Everything discussed and NOT being built, including options rejected or deferred
+     during clarify. Plan and implement must not build anything listed here. -->
 - <explicitly out of scope>
 
 ## User Stories

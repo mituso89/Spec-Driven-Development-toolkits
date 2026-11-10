@@ -16,6 +16,7 @@ Compare, and record findings in `specs/<id>/analysis.md`:
 
 - **Coverage:** every spec requirement maps to ≥1 task; flag uncovered requirements.
 - **Test coverage:** every user story and success criterion (SC-###) has ≥1 verifying test task. Severity follows the constitution's testing principle — blocking if it mandates coverage; otherwise non-blocking. Default: non-blocking.
+- **Acceptance coverage:** check `specs/<id>/acceptance.json` against `m-sdd/acceptance-schema.md` (with `bash` and `jq`: `sdd_validate_acceptance specs/<id>/acceptance.json specs/<id>/spec.md` from `m-sdd/sdd-lib.sh`). A missing or invalid file, or any spec `US#`/`FR-###`/`SC-###` that no criterion covers, is blocking - implement cannot prove "done" without it; send the user back to the plan phase. A vague step ("works", "looks right", no command or pass condition) is blocking too. Also check every criterion is served by ≥1 task in `tasks.md` and every plan phase has an `acceptance.json` entry (blocking if not).
 - **Design coverage:** if `specs/<id>/design/` exists, every screen in `design/README.md` maps to a user story, and the plan covers every screen. Flag orphans both ways (non-blocking).
 - **Consistency:** plan/tasks don't contradict the spec; names/types used consistently.
 - **Constitution:** no artifact violates `.sdd/constitution.md` (guardrails, conventions).

@@ -1,11 +1,11 @@
 ---
 name: m-sdd-analyze
-description: "SDD phase 6 (optional gate) — cross-check constitution, spec, plan, and tasks for consistency before implementation; writes specs/<id>/analysis.md. Routed by m-sdd."
+description: "SDD phase 6 (optional gate) — cross-check constitution, spec, plan, acceptance, and tasks for consistency before implementation; writes specs/<id>/analysis.md. Routed by m-sdd."
 ---
 
 # SDD — Analyze
 
-> **TL;DR** — Gate on completed tasks (0) → cross-check the four artifacts against each other and the constitution (1) → write `analysis.md`, mark done or block, route (2). Read `<skills-root>/m-sdd/_shared.md` first.
+> **TL;DR** — Gate on completed tasks (0) → cross-check the artifacts against each other and the constitution (1) → write `analysis.md`, mark done or block, route (2). Read `<skills-root>/m-sdd/_shared.md` first.
 
 **Pipeline:** tasks → **analyze** → implement. A skippable gate, not optional decoration: `m-sdd-implement` refuses to start until analyze is `done` or explicitly `skipped` (`sdd_set_phase … analyze skipped`).
 
@@ -23,6 +23,7 @@ description: "SDD phase 6 (optional gate) — cross-check constitution, spec, pl
     verifying test task (`[US#]`/`[SC-###]`). Severity follows the constitution's
     testing principle — **blocking** if it mandates coverage; otherwise a
     **non-blocking** note. If the constitution defines no testing principle, default to non-blocking (coverage expected, not gate-blocking).
+  - **Acceptance coverage:** run `sdd_validate_acceptance "specs/$id/acceptance.json" "specs/$id/spec.md"` (schema: `<skills-root>/m-sdd/acceptance-schema.md`). A missing or invalid file, or any spec `US#`/`FR-###`/`SC-###` that no criterion covers, is **blocking** - implement cannot prove "done" without it; send the user back to `m-sdd-plan`. Then read the steps yourself: a vague step ("works", "looks right", no command or pass condition) is blocking too. Also check every criterion is served by ≥1 task in `tasks.md` and every plan phase has an `acceptance.json` entry (blocking if not).
   - **Design coverage:** if `specs/$id/design/` exists, every screen in
     `design/README.md` maps to a user story, and the plan covers every screen. Flag
     orphans both ways (non-blocking).

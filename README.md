@@ -156,16 +156,16 @@ A requirement-first interview. Produces `specs/<id>/spec.md` written for a produ
 *Optional next:* `m-sdd-clarify` (resolve ambiguities) · `m-sdd-checklist` (requirement-quality "unit tests for English").
 
 **3. Plan — `m-sdd-plan`**  ⟶ *approval gate*
-The technical design: stack, architecture, file structure, and a **Testing Strategy** that maps each story/success-criterion to how it's verified. Written to `specs/<id>/plan.md` (+ `research.md`/`data-model.md`/`contracts/` if needed). You approve.
+The technical design: stack, architecture, file structure, and a **Testing Strategy** that maps each story/success-criterion to how it's verified. Written to `specs/<id>/plan.md` (+ `research.md`/`data-model.md`/`contracts/` if needed). The plan is split into phases, and `specs/<id>/acceptance.json` lists each phase's acceptance criteria as exact, checkable steps (commands to run or things to check by hand). You approve both.
 
 **4. Tasks — `m-sdd-tasks`**
-Normalizes the plan into an ordered, checkable `specs/<id>/tasks.md`, with `[US#]/[SC-###]` labels tying each task back to a requirement.
+Normalizes the plan into an ordered, checkable `specs/<id>/tasks.md`, with `[US#]/[SC-###]` labels tying each task back to a requirement and `[PH#][AC-#.#]` labels tying it to the plan phase and acceptance criteria it satisfies.
 
 **5. Analyze (optional, recommended) — `m-sdd-analyze`**
-Cross-checks constitution ↔ spec ↔ plan ↔ tasks for gaps/contradictions and test/design coverage. Blocks on serious findings; writes `specs/<id>/analysis.md`.
+Cross-checks constitution ↔ spec ↔ plan ↔ acceptance ↔ tasks for gaps/contradictions and test/design coverage, including that `acceptance.json` covers every requirement in the spec. Blocks on serious findings; writes `specs/<id>/analysis.md`.
 
 **6. Implement — `m-sdd-implement`**  ⟶ *GO gate*
-Builds the feature in an isolated branch/worktree, task by task, ticking boxes in `tasks.md`. Asks for an explicit "go" before writing any code, and finishes with merge/PR options.
+Builds the feature in an isolated branch/worktree, phase by phase and task by task, ticking boxes in `tasks.md`. Before a phase counts as done it runs or checks every acceptance step and records PASS/FAIL evidence per criterion in `specs/<id>/evidence/<phase>.md`; a failing criterion blocks "done". Asks for an explicit "go" before writing any code, and finishes with merge/PR options.
 
 **7. Issues (optional) — `m-sdd-tasks-to-issues`**
 Pushes `tasks.md` to Jira as linked dev tickets (needs the Atlassian MCP).
@@ -175,7 +175,7 @@ Pushes `tasks.md` to Jira as linked dev tickets (needs the Atlassian MCP).
 Artifacts live **in your project**, not in the toolkit:
 ```
 <project>/.sdd/{constitution.md, knowledge.md, config.json, state.json, templates/}
-<project>/specs/<NNN-slug>/{spec.md, plan.md, tasks.md, analysis.md, design/, ...}
+<project>/specs/<NNN-slug>/{spec.md, plan.md, acceptance.json, tasks.md, analysis.md, evidence/, design/, ...}
 ```
 Commit `.sdd/` and `specs/` to your project repo — they're the durable record of intent.
 
@@ -185,7 +185,7 @@ Commit `.sdd/` and `specs/` to your project repo — they're the durable record 
 
 **Already have a UI design?** (e.g. you mocked it up in an AI chat tool.) Drop the HTML — or a Figma link — into `specs/<id>/design/`. `m-sdd-specify`/`m-sdd-plan` will index it (an auto-generated `design/README.md` maps each screen to a user story) and **reference it read-only** while writing the spec and plan. It's a committed visual reference, not a tracked phase or gate.
 
-**Testing** is woven in, not a separate phase: the spec holds the acceptance contract (Given/When/Then + `SC-###`), the plan's `## Testing Strategy` says how each is verified, `tasks.md` carries `[US#]/[SC-###]`-labelled test tasks, and `analyze` checks coverage. Whether tests are *mandatory* is a line in your constitution (default if unset: expected, not blocking).
+**Testing** is woven in, not a separate phase: the spec holds the acceptance contract (Given/When/Then + `SC-###`), the plan's `## Testing Strategy` says how each is verified, `acceptance.json` turns that into exact per-phase steps, `tasks.md` carries `[US#]/[SC-###]`-labelled test tasks, `analyze` checks coverage, and implement records evidence for every step. The acceptance schema and evidence format are documented once in `m-sdd/acceptance-schema.md`. Whether tests are *mandatory* is a line in your constitution (default if unset: expected, not blocking).
 
 ---
 
@@ -198,10 +198,11 @@ The pipeline's delegates are vendored here (vendored upstream skills gain an `m-
 |---|---|
 | bootstrap (optional, pre-pipeline) | `m-init` — detects your tool (Devin/Claude/Cursor/Windsurf/AGENTS.md), writes the project brief + rules files, then hands `.sdd/` scaffolding to `m-sdd` |
 | specify | — self-contained (convergent requirement-capture interview; optional upstream brainstorm via `m-ask`) |
-| clarify | — self-contained (ambiguity interview of the user; the user decides, not the codebase). Questions someone else owns go through `m-sdd-decision` when installed |
+| clarify | — self-contained (ambiguity interview of the user; the user decides, not the codebase). It is honest about weak decisions, records what is NOT being built under the spec's Non-Goals, and keeps asking while critical ambiguity remains. Questions someone else owns go through `m-sdd-decision` when installed |
 | decisions (optional, any phase) | `m-sdd-decision` - routes a question someone else owns to the right person (product -> ticket creator or requester; engineering -> author of the conflicting earlier work, from PR/commit history), builds one linked question thread per ticket, and logs `specs/<id>/decisions.md`. Posting and ticket write-back are project extension points named in its `config.json` (copy `config.example.json`). `m-sdd-plan`/`m-sdd-implement` stop while a blocking decision is open |
 | checklist (optional) | — self-contained (`m-sdd-checklist`, spec-kit `/speckit.checklist` parity) |
-| plan | `m-writing-plans` |
+| plan | `m-writing-plans` (+ writes `acceptance.json`) |
+| research (plan, clarify, implement) | `m-research-helpers` - four strictly read-only subagent prompts: locator (paths + line ranges), analyzer (one flow with `file:line`), pattern finder (existing examples to copy), web researcher (primary sources, cited). They keep the main agent's context small; works in Devin CLI and Claude Code, with optional native agent profiles |
 | implement | `m-implement` (orchestrator engine) → `m-subagent-driven-development`, `m-worktree`, `m-finishing-a-development-branch`, `m-git-commit` |
 | tasks-to-issues | `m-story-breakdown` (+ board MCP — Jira or Azure DevOps, detected via `m-board`) |
 | quality companions (optional) | `m-security-and-hardening`, `m-performance-optimization`, `m-debugging-and-error-recovery`, `m-api-and-interface-design`, `m-frontend-ui-engineering` |
@@ -209,7 +210,7 @@ The pipeline's delegates are vendored here (vendored upstream skills gain an `m-
 Plus transitive deps (`m-test-driven-development`, `m-requesting-code-review`, `m-receiving-code-review`). Refresh the vendored copies from your live skills with `bash vendor.sh`.
 
 ### State helpers (`m-sdd/sdd-lib.sh`)
-`sdd_list` (all features, `*` = active) · `sdd_set_active <id>` (switch feature) · `sdd_status` (active feature's pipeline). Never hand-edit `.sdd/state.json`/`config.json` — go through the lib. After changing the lib, run `bash m-sdd/test_sdd_lib.sh` (dual bash+zsh suite).
+`sdd_list` (all features, `*` = active) · `sdd_set_active <id>` (switch feature) · `sdd_status` (active feature's pipeline) · `sdd_validate_acceptance <acceptance.json> [spec.md]` (check the acceptance file and its spec coverage). Never hand-edit `.sdd/state.json`/`config.json` — go through the lib. After changing the lib, run `bash m-sdd/test_sdd_lib.sh` (dual bash+zsh suite).
 
 ### Layout
 ```
@@ -220,10 +221,12 @@ sdd-toolkit/
     sdd-lib.sh               # jq-backed state machine (zsh-safe)
     test_sdd_lib.sh          # dual bash+zsh unit suite
     _shared.md               # cross-cutting rules (delegate, constitution, HITL gates)
+    acceptance-schema.md     # acceptance.json + evidence file format (single reference)
     templates/               # constitution / knowledge / spec / plan / tasks / checklist / design
   m-init/                    # optional pre-pipeline bootstrap: project brief + rules files
   m-sdd-<phase>/SKILL.md     # one folder per pipeline phase
   m-sdd-decision/            # route questions to their owner, decision log (+ config.example.json)
+  m-research-helpers/        # read-only locator / analyzer / pattern finder / web researcher prompts
   docs/                      # design notes, plans, audits
 ```
 

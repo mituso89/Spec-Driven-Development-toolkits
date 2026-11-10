@@ -53,6 +53,8 @@ Never advance a `pending` phase to `approved` without an explicit human OK.
 - Plan:  `specs/<id>/plan.md`
 - Tasks: `specs/<id>/tasks.md`
 - Analysis: `specs/<id>/analysis.md`
+- Acceptance: `specs/<id>/acceptance.json` (per-phase criteria with exact steps, written by plan)
+- Evidence: `specs/<id>/evidence/<phase-id>.md` (per-criterion PASS/FAIL, written by implement). Schema for both: `m-sdd/acceptance-schema.md`
 - Design (optional): `specs/<id>/design/` — visual reference, read-only input
 - Plan companions: `specs/<id>/{research.md,data-model.md,contracts/}`
 - Checklists (optional): `specs/<id>/checklists/<domain>.md`

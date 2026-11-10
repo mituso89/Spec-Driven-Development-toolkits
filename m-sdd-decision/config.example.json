@@ -1,23 +1,12 @@
 {
-  "ado": {
-    "organization": "access-devops",
-    "project": "Elay",
-    "decisionsField": {
-      "User Story": "System.Description",
-      "Bug": "Microsoft.VSTS.TCM.ReproSteps"
-    }
-  },
-  "sessionUser": "<your ADO unique name, e.g. first.last@example.com>",
-  "teams": {
-    "teamId": "<Teams team id (GUID)>",
-    "channelId": "<spec decision channel id, e.g. 19:...@thread.tacv2>",
-    "channelName": "<spec decision channel display name>"
-  },
-  "people": {
-    "<ADO unique name, e.g. first.last@example.com>": {
-      "displayName": "<name as shown in Teams>",
-      "aadUserId": "<Entra ID (AAD) object id, used for the Teams @mention>"
-    }
-  },
-  "decisionLogPath": "docs/decisions.md"
+  "ticketRefFormat": "PROJ-{id}",
+  "ticketLinkTemplate": "https://tracker.example.com/browse/PROJ-{id}",
+  "sessionUser": "<your tracker or git identity, e.g. first.last@example.com>",
+  "language": "en",
+  "decisionLogPath": "docs/decisions.md",
+  "delivery": {
+    "post": "<project skill or documented step that posts a question thread, e.g. my-team-post-decision>",
+    "collect": "<project skill or step that reads the replies, or null to have the caller paste them>",
+    "writeBack": "<project skill or step that records the answer on the ticket, e.g. my-team-ticket-writeback, or m-board>"
+  }
 }

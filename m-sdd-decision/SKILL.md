@@ -1,175 +1,158 @@
 ---
 name: m-sdd-decision
 description: >
-  Outreach (Elay) product - route open spec, scout or build questions on an
-  Outreach ADO ticket to the right person: product questions to the ticket's
-  creator or requester, engineering questions to whoever made the conflicting
-  earlier work. Posts one English question thread per ticket to the team's
-  Teams spec decision channel (every AB# linked), keeps a decision log, and
-  writes each answer back to the ticket as a linked ADO comment and as a dated
-  entry in the work item's Decisions section (acceptance criteria too when the
-  answer changes what must be built).
-  Questions for the person running the session are asked in chat, never posted.
+  Route open spec, scout or build questions on a ticket to the person who
+  should decide: product questions to the ticket's creator or requester,
+  engineering questions to whoever made the conflicting earlier work (found via
+  PR and commit history), with the evidence recorded. Questions for the person
+  running the session stay in chat. Builds one question thread per ticket in a
+  fixed format (linked ticket, numbered questions, options with examples,
+  recommendation, blocks-the-build, default, one-line reply), keeps the decision
+  log in specs/<id>/decisions.md, and hands posting and ticket write-back to a
+  project-defined step. Called by m-sdd-clarify, m-sdd-plan and m-sdd-implement.
   Triggers: spec decision, sdd decision, ask the PO, who should I ask, open
   question on ticket, conflicting earlier work, blocking question, decision log,
-  post question to Teams, spec decision channel, record the answer on the ticket.
-allowed-tools:
-  - read
-  - grep
-  - glob
-  - exec
-  - edit
-  - write
+  who owns this decision.
 ---
 
-# Outreach - SDD decision routing
+# SDD - Decision routing
 
-> **TL;DR** - Load config (0) -> list the open questions and find each owner with evidence (1) -> split: session user in chat, everyone else in one Teams thread per ticket (2) -> build the post (3) -> post or hand back the exact post (4) -> log every question (5) -> collect answers (6) -> write the answer back to the ticket: a comment plus the work item's Decisions section and acceptance criteria (7).
+> **TL;DR** - Load config (0) -> list the open questions and find each owner with evidence (1) -> split: session user in chat, everyone else in one thread per ticket (2) -> build the post (3) -> hand it to the project's post step (4) -> log every question (5) -> collect answers (6) -> hand the answer to the project's write-back step (7).
 
-Built for the Outreach (Elay) team: tickets in Azure DevOps, questions in a Teams spec decision channel.
-The layout below is the Outreach format; do not swap in another team's question style.
-All posted text, log entries and ticket comments are in English.
+This skill decides **who** to ask, **what** to ask and **what was decided**.
+**How** a post reaches people (chat tool, channel, mentions) and **how** a ticket is updated (tracker, fields, comments) belong to the project, through the extension points in Phase 4 and Phase 7.
+Never hard-code a tracker API, chat API, channel, field name or person in this skill.
 
 ## When to use
 
-- A spec, scout or build has an open product or engineering question on an Outreach ticket (`AB#<id>`).
-- `m-sdd-clarify`, `m-sdd-plan` or `m-sdd-implement` hands you a question whose owner is not the person running the session.
-- Someone asks "who should I ask about this?" for an Outreach ticket.
+- A spec, scout or build has an open product or engineering question on a ticket.
+- `m-sdd-clarify`, `m-sdd-plan` or `m-sdd-implement` hands over a question whose owner is not the person running the session.
+- Someone asks "who should decide this?".
 
-## The two rules that shape everything
+## Two rules
 
-1. **Only post when someone else must answer.** A question for the session user is asked in chat and never posted. Nothing else is ever posted either: no recaps, no summaries, no "thanks, noted" replies.
-2. **Every ticket reference is a link.** Every `AB#<id>` you write - in Teams, in chat, in the log, in an ADO comment - links to `https://dev.azure.com/<org>/<project>/_workitems/edit/<id>` (org and project from config, defaults `access-devops` / `Elay`). In Markdown write `[AB#<id>](<url>)`; in HTML write `<a href="<url>">AB#<id></a>`. Bare `AB#<id>` and bare URLs are not rendered as links by ADO comments, so never rely on auto-linking.
+1. **Only post when someone else must answer.** A question the session user owns is asked in chat and never posted. Nothing else is posted either: no recaps, no summaries, no "thanks, noted" replies.
+2. **Every ticket reference is a link.** Build it from `ticketLinkTemplate` and write it as `[<ref>](<url>)` everywhere this skill writes: the post, chat, the log, the write-back record. Never rely on a tool auto-linking a bare reference.
 
 ## Phase 0 - Config
 
-Resolve config in order, first hit wins: `<project skills root>/m-sdd-decision/config.json` -> `<global skills root>/m-sdd-decision/config.json`.
-If neither exists, read `config.example.json`, tell the user once to copy it to `config.json` next to it and fill it in, and continue in **hand-back mode** (Phase 4) with org/project defaults.
+Resolve config in order, first hit wins: `<project skills root>/m-sdd-decision/config.json` -> `<global skills root>/m-sdd-decision/config.json` -> `<skill-dir>/config.example.json`.
+If only the example was found, tell the user once to copy it to `config.json` and fill it in.
 
 | Key | Use |
 |---|---|
-| `ado.organization`, `ado.project` | Ticket links and ADO API calls. Defaults `access-devops`, `Elay`. |
-| `ado.decisionsField` | Optional work item type -> field for the Decisions section (Phase 7b). |
-| `sessionUser` | ADO unique name of the person running the session. Questions they own go to chat. If unset, ask once. |
-| `teams.teamId`, `teams.channelId`, `teams.channelName` | The spec decision channel. Ids come only from here - never guess, search for or hard-code them. |
-| `people` | ADO unique name -> Teams `displayName` + `aadUserId` for @mentions. Mention ids come only from here. |
+| `ticketRefFormat` | How a ticket is written, with `{id}`, e.g. `PROJ-{id}`. |
+| `ticketLinkTemplate` | Ticket URL with `{id}`. If unset, ask once; never guess a tracker URL. |
+| `sessionUser` | Identity of the person running the session (tracker or git). Their questions go to chat. If unset, ask once. |
+| `language` | Language of the post, log and write-back. Default `en`. |
 | `decisionLogPath` | Log path when there is no SDD feature (Phase 5). |
+| `delivery.post`, `delivery.collect`, `delivery.writeBack` | The project's extension points (Phase 4, 6, 7). Unset means hand back to the caller. |
 
-`config.json` is gitignored. Never commit names, e-mails, user ids, Teams ids or tokens.
+`config.json` is gitignored. Never commit names, e-mails, user ids, channel ids or tokens.
 
 ## Phase 1 - Questions and owners
 
-Read the ticket in full first: title, description, acceptance criteria, repro steps, comments and links (`System.Description` and `Microsoft.VSTS.TCM.ReproSteps` both).
-Then write each open question in one sentence and classify it:
+Read the ticket in full first (description, acceptance criteria, comments, linked tickets).
+Write each open question in one sentence and classify it:
 
 - **Product** - what the user sees, scope, wording, behaviour, priority.
-  Owner: the requester named in the ticket (a "Requested by" line, a stakeholder field, or the person a comment says asked for it); otherwise the ticket creator (`System.CreatedBy`).
+  Owner: the requester named in the ticket (a "requested by" line, a stakeholder field, or the person a comment says asked for it); otherwise the ticket's creator.
 - **Engineering** - the question exists because the new work conflicts with something already built (code, contract, package layout, an earlier ticket's decision).
-  Owner: the person who made that earlier work, found in this order and stopping at the first hit:
+  Owner: the person who made that earlier work, first hit wins:
   1. Author of the PR that introduced it (find the commit with `git log -S '<symbol>' --oneline` or `git blame -L <start>,<end> <file>`, then the PR that merged it).
   2. Author of that commit when no PR exists.
-  3. `System.AssignedTo` of the earlier ticket that delivered it.
+  3. Assignee of the earlier ticket that delivered it.
   4. Fallback: ask the session user who owns it. Never guess.
 
 Skip bots and service accounts.
-Record the evidence for every owner as one line you can link, for example "created [AB#2897973](...)" or "authored [PR 1931](...) that built the Contacts filter panel".
-If the owner is not in `config.people`, ask the session user to add them; until then hand back the post with a plain-name placeholder instead of a broken mention.
+Record the evidence for every owner as one linked line, for example "created [PROJ-123](...)" or "authored [PR 45](...) that built the current filter panel".
 
 ## Phase 2 - Split
 
-- Owner is `sessionUser` -> ask in chat now, one question at a time, using the same question block as Phase 3 (options, recommendation, blocks-the-build). Do not post it.
-- Every other owner -> one Teams thread per ticket holding all of that ticket's questions; every owner is @mentioned once in the owner line.
+- Owner is `sessionUser` -> ask in chat now, one question at a time, with the same question block as Phase 3. Do not post it.
+- Every other owner -> one thread per ticket holding all of that ticket's questions.
 
 For each question decide **blocks the build: yes/no**.
 It blocks when the answer changes the data model, an API or package contract, user-visible scope, or anything expensive to undo.
-Otherwise it does not block: name the **default** you will use (normally your recommendation) and keep working on it.
+Otherwise it does not block: name the **default** used meanwhile (normally your recommendation) and keep working on it.
 
-## Phase 3 - The Outreach post
+## Phase 3 - The post
 
-- **Subject** (Teams thread subject, plain text): `[AB#<id>] <short title>` - under 80 characters. Teams subjects cannot hold links, so the body opens with the ticket as a link.
-- **Body** (HTML), top to bottom:
-  1. Header: `<linked AB#id> · <short title>`.
-  2. Owner line: `<N> question(s) · for @<owner> (<why them, with the evidence link>)`. With several owners, list each one once here: `for @A (...) and @B (...)`.
-  3. A rule (`<hr>`).
-  4. Per question, in order:
-     - `Q<n> · <bold question ending in ?>`. With several owners, follow it with `(for <owner name>)` so each person sees which question is theirs.
-     - `Situation:` the facts in plain words, with the evidence linked inline (PRs, files pinned to a commit, earlier tickets as linked `AB#<id>`).
-     - Lettered options `a)`, `b)`, `c)` - each with a concrete Outreach example (a real screen, list, flow, package or user action).
+Produce a **post package**: subject, body (Markdown), and the mention list.
+
+- **Subject:** `[<ref>] <short title>`, under 80 characters, plain text.
+- **Body**, top to bottom:
+  1. Header: `<linked ref> · <short title>`.
+  2. Owner line: `<N> question(s) · for @<owner> (<why them, with the evidence link>)`; several owners are each listed once: `for @a (...) and @b (...)`.
+  3. A rule (`---`).
+  4. Per question:
+     - `Q<n> · **<question ending in ?>**`, followed by `(for <owner>)` when there are several owners.
+     - `Situation:` the facts in plain words, evidence linked inline (PRs, files pinned to a commit, linked tickets).
+     - Options `a)`, `b)`, `c)`, each with a concrete example from this product (a real screen, flow, module or user action).
      - `Recommendation: <letter> - <reason>`.
      - `Blocks the build: yes` or `Blocks the build: no`.
-     - `Default if no answer: <letter> - <option>` when it does not block; `Default if no answer: none - the build waits` when it does.
-  5. A rule (`<hr>`).
-  6. `Reply in one line: Q1: a - because ...` (one line per question when there are several). A bare `Q1: a` is valid; anything outside the options is `Q1: other - ...`.
-- Keep it short enough to read on a phone. No greetings, sign-offs or recap.
+     - `Default if no answer: <letter> - <option>`, or `Default if no answer: none - the build waits` when it blocks.
+  5. A rule (`---`).
+  6. `Reply in one line: Q1: a - because ...` (one line per question). A bare `Q1: a` is valid; anything outside the options is `Q1: other - ...`.
+- **Mention list:** each owner's identity as found in Phase 1 (tracker or git) and the question numbers they own. The project's post step maps identities to its chat tool's mentions.
+- Short enough to read on a phone. No greetings, sign-offs or recap.
 
-A complete rendered example ([AB#2897973](https://dev.azure.com/access-devops/Elay/_workitems/edit/2897973), shared filter panel package question), its HTML, the Graph payload, a reply, the log entry, the ADO comment and the work item update are in `references/example-post.md`.
-Match that layout exactly.
+A complete example is in `references/example-post.md`.
 
-## Phase 4 - Post or hand back
+## Phase 4 - Post (extension point)
 
-Show the user the exact post (subject, rendered body, who gets mentioned) and get an OK before sending.
-
-- **Teams route available** (a Microsoft Graph route such as an MCP connector for Teams channel messages, or a Graph token allowed to send channel messages): `POST /teams/{teamId}/channels/{channelId}/messages` with `subject`, `body.contentType = "html"`, and a `mentions` array whose entries match the `<at id="N">` tags in the body. Read the message back and confirm the mentions and links rendered. Keep the returned message id and web URL for the log.
-- **No Teams route** (no access, config incomplete, or the call fails): stop and hand back the exact post for the caller to send - the subject, the full HTML body, and the mention list (display name + AAD id, or the placeholder). Never retry with a guessed id or a different channel.
+Show the user the post package and get an OK.
+Then hand it to `delivery.post` - a project skill or documented step that knows the chat tool, the channel and how to mention people.
+That step returns the thread link, which goes in the log.
+If `delivery.post` is unset or fails, hand the exact post package back to the caller to send, and log the question with `Asked: <date> - handed back for posting`.
 
 ## Phase 5 - Decision log
 
-Append one entry per question - chat questions included - when it is asked, and update it when answered.
-Path: `specs/<feature-id>/decisions.md` when an SDD feature is active (`.sdd/` exists), otherwise `config.decisionLogPath`.
-Create the file with a `# Decisions` heading if it is missing.
-Ids `D-001`, `D-002`, ... are per file.
+Append one entry per question - chat questions included - when it is asked; update it when answered.
+Path: `specs/<feature-id>/decisions.md` when an SDD feature is active (`.sdd/` exists), otherwise `decisionLogPath`.
+Create the file with a `# Decisions` heading if missing. Ids `D-001`, `D-002`, ... are per file.
 
 ```markdown
 ## D-001 - <short question title>
-- Ticket: [AB#<id>](<ticket url>)
+- Ticket: [<ref>](<ticket url>)
 - Kind: product | engineering
 - Owner: <name> - <evidence with link>
 - Status: open | answered
 - Blocks build: yes | no
 - Default if no answer: <letter - option, or "none - the build waits" when it blocks>
-- Question: <the bold question line>
-- Asked: <YYYY-MM-DD> in [Teams thread](<message url>) | in chat
+- Question: <the question line>
+- Asked: <YYYY-MM-DD> in [thread](<thread url>) | in chat
 - Answer: <letter - reason as given>
 - Answered by: <name>
 - Answered on: <YYYY-MM-DD>
-- Links: [PR <n>](<url>), [<file>](<url>), [AB#<id>](<url>)
+- Changes what must be built: yes | no
+- Links: [PR <n>](<url>), [<file>](<url>), [<ref>](<url>)
 ```
 
 `Status:` and `Blocks build:` are the contract the SDD phases read: `m-sdd-plan` and `m-sdd-implement` stop while any entry is `Status: open` with `Blocks build: yes`.
 
 ## Phase 6 - Collect answers
 
-Read the thread replies (`GET .../messages/{messageId}/replies`) when the route allows it; otherwise ask the caller to paste them.
+Get the replies through `delivery.collect`, or ask the caller to paste them.
 Parse `Q<n>: <letter|other> - <reason>` per line.
-An answer is valid only from the question's owner, or from someone the owner or session user names in the thread; anything else, or an unclear reply, goes to the session user in chat.
-Update the log entry to `Status: answered` with answer, who and date.
-Do not reply in Teams to confirm; the ticket update in Phase 7 is the record.
-In an SDD feature, hand product answers to `m-sdd-clarify` Phase 2 to fold into the spec (it owns re-approval); engineering answers feed `m-sdd-plan`.
+An answer counts only from the question's owner, or from someone the owner or session user names in the thread; anything else, or an unclear reply, goes to the session user in chat.
+Update the log entry to `Status: answered`, and set `Changes what must be built`.
+Do not post a confirmation; the write-back is the record.
+In an SDD feature, product answers go back to `m-sdd-clarify` Phase 2 to fold into the spec (it owns re-approval); engineering answers feed `m-sdd-plan`.
 
-## Phase 7 - Write back to the ticket
+## Phase 7 - Write back (extension point)
 
-Every answered decision lands on the ticket in two places: a comment (7a) and the work item itself (7b).
-The session user's own chat answers get 7b only, unless they also ask for a comment.
-Show the user both drafts (comment HTML, and the before/after of each field) and get an OK before writing.
-
-**7a - Comment.** Post an English ADO comment (azure-devops MCP comment tool, `az boards work-item update --discussion`, or `POST _apis/wit/workItems/{id}/comments?api-version=7.1-preview.4`).
-Use HTML with explicit `<a href>` anchors for every ticket, PR, file and the Teams thread.
-Read it back with `$expand=renderedText` and count the anchors before saying it is done.
-
-**7b - Work item.** Update the ticket so it reflects the decision without anyone reading the comments.
-
-1. **Read first:** `GET _apis/wit/workitems/{id}?fields=System.Rev,System.WorkItemType,System.Description,Microsoft.VSTS.TCM.ReproSteps,Microsoft.VSTS.Common.AcceptanceCriteria&api-version=7.1`.
-2. **Pick the field** for the Decisions section: `config.ado.decisionsField[<work item type>]` when set; otherwise `System.Description`, except a Bug uses `Microsoft.VSTS.TCM.ReproSteps` (the field a Bug shows).
-3. **Decisions section:** keep every existing character of the field. If a `<h3>Decisions</h3>` heading already exists, add the entry at the end of that section; otherwise append the heading and the entry at the end of the field. One dated entry per decision, starting with its `D-NNN` id: question, answer, who answered, date, and a link to the Teams thread (or "answered in chat"), with every `AB#` and PR as an `<a href>`. The only existing text this skill may replace is its own entry with the same `D-NNN` (for example open -> answered).
-4. **Acceptance criteria** (`Microsoft.VSTS.Common.AcceptanceCriteria`) change only when the answer changes what must be built. Append the new or changed criterion with a `(D-NNN, <date>)` suffix. Never delete or reword an existing criterion: when the answer contradicts one, leave it and add `Replaces: "<old criterion>"` to the new line, so the product owner can tidy it.
-5. **Write** with one JSON Patch: `PATCH _apis/wit/workitems/{id}?api-version=7.1`, `Content-Type: application/json-patch+json`, body `[{"op":"test","path":"/rev","value":<System.Rev from step 1>}, {"op":"add","path":"/fields/<field>","value":"<full new HTML>"}, ...]`. The `test` op makes the write fail if someone edited the ticket since step 1; then re-read and rebuild from the new text, once. A second failure goes to the user.
-6. **Verify:** read the work item again and confirm the old field text is still all there, the `D-NNN` entry and any new criterion are present, and the anchors are intact. Only then mark the log entry's `Links:` with the ticket update.
+Hand each answered entry to `delivery.writeBack` - a project skill or documented step that knows the tracker.
+`m-board` can serve as that step for teams whose board it supports; it is one option, not a requirement.
+Pass it the **decision record**: the log entry plus a short ready-to-use text in `language` - question, answer, who answered, date, and links (ticket, thread, PRs) all written as links.
+When `Changes what must be built: yes`, also pass the acceptance-criteria line to add, suffixed `(D-NNN, <date>)`.
+What the project step must honour: read before writing, keep existing ticket text (add, never reword or delete), and read back to verify.
+If `delivery.writeBack` is unset, hand the decision record back to the caller.
 
 ## Never
 
 - Post a question the session user owns, or post any recap, summary or acknowledgement.
-- Write a bare `AB#<id>` or bare URL anywhere this skill writes.
-- Overwrite, reword or delete existing ticket text, or write a work item field without reading it first and checking `/rev`.
-- Guess an owner, a Teams id or a mention id, or commit one.
+- Write a bare ticket reference or bare URL anywhere this skill writes.
+- Guess an owner, or commit a name, identity or channel.
+- Call a tracker or chat API from this skill - that is the project's delivery step.
 - Mark a question non-blocking just to keep going when its answer would change a contract or user-visible scope.
-- Treat a non-owner's reply as the decision.

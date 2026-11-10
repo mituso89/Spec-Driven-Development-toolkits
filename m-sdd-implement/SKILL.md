@@ -15,7 +15,8 @@ description: "SDD phase 7 — gate on tasks+analyze and a human GO, then delegat
 - `source <skills-root>/m-sdd/sdd-lib.sh; root="$(pwd)"; id="$(sdd_active_feature "$root")"`
 - `sdd_require "$root" "$id" tasks "done"` — tasks must be derived.
 - `sdd_require "$root" "$id" analyze "done,skipped"` — analyze must have run clean or been explicitly skipped; never implement on a still-`pending`/`in_progress` consistency gate.
-- **Human GO gate — the point of no return into code (load-bearing).** Before writing any code: summarize what will be built (the `tasks.md` list), the target branch/worktree, and any open analyze findings the user must own; then get the user's explicit "go". If not confirmed, stop. Do NOT proceed autonomously past this point. **This is the single GO gate for the run** — the engine in Phase 1 is told it is already gated and must not ask again.
+- **Open decisions gate.** If `specs/$id/decisions.md` exists, re-read it now (answers can change after the plan): any `## D-NNN` entry with `Status: open` and `Blocks build: yes` -> stop and list it (id, question, owner, ticket link); no GO is asked while one is open. Entries with `Status: open` and `Blocks build: no` go into the GO summary with the default the build will use.
+- **Human GO gate — the point of no return into code (load-bearing).** Before writing any code: summarize what will be built (the `tasks.md` list), the target branch/worktree, the defaults used for open non-blocking decisions, and any open analyze findings the user must own; then get the user's explicit "go". If not confirmed, stop. Do NOT proceed autonomously past this point. **This is the single GO gate for the run** — the engine in Phase 1 is told it is already gated and must not ask again.
 
 > Optional companion: if implementation hits unexpected failures or test breakages, run `m-debugging-and-error-recovery` for structured root-cause triage before retrying.
 
@@ -27,6 +28,7 @@ description: "SDD phase 7 — gate on tasks+analyze and a human GO, then delegat
   - **Project knowledge / reuse:** the structural grounding from Phase 0 (`.sdd/repo-map.md` or the code MCP) + `.sdd/knowledge.md`.
   - **Pre-gated flag:** GO was obtained in Phase 0 — m-implement must skip its own Phase 0 GO/ambiguity gate and start at implement.
 - As tasks complete, update the `- [ ]` boxes in `tasks.md` (SDD bookkeeping the engine doesn't own).
+- A new question that someone other than the user must answer goes through `m-sdd-decision` when it is installed. If it blocks the build, stop the affected tasks until it is answered; if not, continue on its default and list it in the final report.
 
 ## Phase 2 — Record & route
 - The engine has already finished the branch (merge/PR/cleanup) and committed. Here just record SDD state and route.

@@ -8,6 +8,10 @@
 
 - Read `.sdd/pipeline.md`. If `specify` is not `approved`, stop and tell the user to complete the specify phase first.
 - Load `.sdd/constitution.md` — the plan's tech choices must respect it.
+- **Open decisions gate.** If `specs/<id>/decisions.md` exists, read every `## D-NNN` entry.
+  - Any entry with `Status: open` and `Blocks build: yes` -> stop. List each one (id, question, owner, ticket link) and tell the user the plan waits for those answers. Do not plan around a guessed answer.
+  - Entries with `Status: open` and `Blocks build: no` -> continue on their `Default if no answer:`. List each default to the user now, and record them in the plan as assumptions to revisit.
+  - `Status: answered` entries are inputs: the plan must follow them.
 - Load `.sdd/knowledge.md`'s `Structural grounding` pointer if present (repo map or code index) — use it to base file/architecture choices on what already exists.
 - Update `.sdd/pipeline.md`: set `plan` row to `in_progress`.
 

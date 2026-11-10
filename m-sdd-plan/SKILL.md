@@ -14,6 +14,10 @@ description: "SDD phase 4 — technical implementation plan via m-writing-plans,
 - Load the **structural grounding** if present: read `.sdd/knowledge.md`'s `Structural grounding` line → load `.sdd/repo-map.md` (generated), or use the named code MCP (`serena`/`codegraph`). This is the structural half of grounding (knowledge.md = curated facts); use it in Phase 1.
 - `source <skills-root>/m-sdd/sdd-lib.sh; root="$(pwd)"; id="$(sdd_active_feature "$root")"`
 - `sdd_require "$root" "$id" specify "approved"` — no plan without an approved spec.
+- **Open decisions gate.** If `specs/$id/decisions.md` exists, read every `## D-NNN` entry.
+  - Any entry with `Status: open` and `Blocks build: yes` -> stop. List each one (id, question, owner, ticket link) and tell the user the plan waits for those answers (`m-sdd-decision` collects them). Do not plan around a guessed answer.
+  - Entries with `Status: open` and `Blocks build: no` -> continue on their `Default if no answer:`. List each default to the user now, and record them in the plan as assumptions to revisit.
+  - `Status: answered` entries are inputs: the plan must follow them.
 
 ## Phase 1 — Delegate to m-writing-plans
 - `sdd_set_phase "$root" "$id" plan in_progress`

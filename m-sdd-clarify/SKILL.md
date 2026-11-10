@@ -36,8 +36,13 @@ description: "SDD phase 3 (optional) — interview the user to resolve spec ambi
   - **You ask — the user decides.** Never auto-answer an ambiguity from the codebase and move on: repo facts may *inform* how you phrase the question, but the answer is the user's.
   - Stay requirement-first — questions are about user value, scope, and acceptance, never technology or approach (that's `m-sdd-plan`).
   - Keep it bounded: cover the points that actually affect scope; don't manufacture questions where the Assumption is already safe.
+- **Questions someone else owns.** When the person who must decide is not the user running the session (for example the ticket's requester, or the author of earlier work the spec conflicts with) and a project decision skill is installed (`m-sdd-decision`), route that question through it instead of guessing or asking the user to speak for them.
+  It finds the owner, asks them, and records the question in `specs/$id/decisions.md` with `Status: open`, `Blocks build: yes|no` and the default used meanwhile (normally the spec's current Assumption).
+  The user's own questions stay in this interview as above.
+  With no decision skill installed, ask the user as today and note who should confirm the answer.
 
 ## Phase 2 — Record, re-approve & route
 - Append the resolved Q&A under the `## Clarifications` heading in `specs/$id/spec.md` (do not rewrite earlier sections).
 - **Re-approval gate:** clarify mutates an already-`approved` spec, so its approval is now stale. If any answer changed scope/requirements, reset and re-confirm: `sdd_set_phase "$root" "$id" specify in_progress`, show the user the updated spec, and on their OK `sdd_set_phase "$root" "$id" specify approved`. Pure wording tweaks that change no requirement may keep the existing approval — say which you did.
-- `sdd_set_phase "$root" "$id" clarify done`; route to `m-sdd-plan` (which `sdd_require`s `specify approved`).
+- Answers that arrive later through the decision skill come back here: fold them into `## Clarifications` with their `D-NNN` id and apply the same re-approval gate.
+- `sdd_set_phase "$root" "$id" clarify done`; route to `m-sdd-plan` (which `sdd_require`s `specify approved`). If `decisions.md` still has an open blocking entry, say so: plan will stop until it is answered.

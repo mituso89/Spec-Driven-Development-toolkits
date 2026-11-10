@@ -198,7 +198,8 @@ The pipeline's delegates are vendored here (vendored upstream skills gain an `m-
 |---|---|
 | bootstrap (optional, pre-pipeline) | `m-init` — detects your tool (Devin/Claude/Cursor/Windsurf/AGENTS.md), writes the project brief + rules files, then hands `.sdd/` scaffolding to `m-sdd` |
 | specify | — self-contained (convergent requirement-capture interview; optional upstream brainstorm via `m-ask`) |
-| clarify | — self-contained (ambiguity interview of the user; the user decides, not the codebase) |
+| clarify | — self-contained (ambiguity interview of the user; the user decides, not the codebase). Questions someone else owns go through `m-sdd-decision` when installed |
+| decisions (optional, any phase) | `m-sdd-decision` - Outreach (Elay) team: asks the ticket's requester (product) or the author of the conflicting earlier work (engineering) in one Teams thread per ticket, logs `specs/<id>/decisions.md`, writes the answer back to the ADO ticket with every `AB#` linked. Copy its `config.example.json` to `config.json` (gitignored) for the Teams ids. `m-sdd-plan`/`m-sdd-implement` stop while a blocking decision is open |
 | checklist (optional) | — self-contained (`m-sdd-checklist`, spec-kit `/speckit.checklist` parity) |
 | plan | `m-writing-plans` |
 | implement | `m-implement` (orchestrator engine) → `m-subagent-driven-development`, `m-worktree`, `m-finishing-a-development-branch`, `m-git-commit` |
@@ -222,6 +223,7 @@ sdd-toolkit/
     templates/               # constitution / knowledge / spec / plan / tasks / checklist / design
   m-init/                    # optional pre-pipeline bootstrap: project brief + rules files
   m-sdd-<phase>/SKILL.md     # one folder per pipeline phase
+  m-sdd-decision/            # route questions to their owner, decision log (+ config.example.json)
   docs/                      # design notes, plans, audits
 ```
 

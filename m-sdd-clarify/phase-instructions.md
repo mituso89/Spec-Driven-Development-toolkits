@@ -22,10 +22,15 @@
   - If `specs/<id>/design/` exists, a mockup may already answer a UI ambiguity — use it to inform the question; the user still decides.
 - Interview the user **one question at a time**; prefer multiple-choice. For each: state the ambiguity, give the spec's current assumption as the default, and let the user confirm or override.
 - Stay requirement-first — questions are about user value, scope, and acceptance, never technology.
+- **Questions someone else owns.** When the person who must decide is not the user running the session (for example the ticket's requester, or the author of earlier work the spec conflicts with) and a project decision skill is installed (`m-sdd-decision`), route that question through it instead of guessing or asking the user to speak for them.
+  It finds the owner, asks them, and records the question in `specs/<id>/decisions.md` with `Status: open`, `Blocks build: yes|no` and the default used meanwhile (normally the spec's current Assumption).
+  The user's own questions stay in this interview as above.
+  With no decision skill installed, ask the user as today and note who should confirm the answer.
 
 ## Phase 2 — Record, re-approve & route
 
 - Append the resolved Q&A under the `## Clarifications` heading in `specs/<id>/spec.md` (do not rewrite earlier sections).
 - **Re-approval:** if any answer changed scope/requirements, reset `specify` to `in_progress` in `.sdd/pipeline.md`, show the user the updated spec, and on their OK set `specify` back to `approved`. Pure wording tweaks that change no requirement may keep the existing approval — state which you did.
+- Answers that arrive later through the decision skill come back here: fold them into `## Clarifications` with their `D-NNN` id and apply the same re-approval rule.
 - Update `.sdd/pipeline.md`: set `clarify` row to `done`.
-- Route to plan phase.
+- Route to plan phase. If `specs/<id>/decisions.md` still has an open blocking entry, say so: plan will stop until it is answered.

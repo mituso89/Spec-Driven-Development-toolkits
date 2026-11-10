@@ -1,0 +1,19 @@
+{
+  "ado": {
+    "organization": "access-devops",
+    "project": "Elay"
+  },
+  "sessionUser": "<your ADO unique name, e.g. first.last@example.com>",
+  "teams": {
+    "teamId": "<Teams team id (GUID)>",
+    "channelId": "<spec decision channel id, e.g. 19:...@thread.tacv2>",
+    "channelName": "<spec decision channel display name>"
+  },
+  "people": {
+    "<ADO unique name, e.g. first.last@example.com>": {
+      "displayName": "<name as shown in Teams>",
+      "aadUserId": "<Entra ID (AAD) object id, used for the Teams @mention>"
+    }
+  },
+  "decisionLogPath": "docs/decisions.md"
+}

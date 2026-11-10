@@ -1,7 +1,11 @@
 {
   "ado": {
     "organization": "access-devops",
-    "project": "Elay"
+    "project": "Elay",
+    "decisionsField": {
+      "User Story": "System.Description",
+      "Bug": "Microsoft.VSTS.TCM.ReproSteps"
+    }
   },
   "sessionUser": "<your ADO unique name, e.g. first.last@example.com>",
   "teams": {

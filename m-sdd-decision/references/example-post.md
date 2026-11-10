@@ -154,3 +154,40 @@ Q2 has no reply yet, so it stays open and the build uses its default (a).
 ```
 
 After posting, read it back with `$expand=renderedText` and confirm it has 4 anchors.
+
+## Work item update on [AB#2897973](https://dev.azure.com/access-devops/Elay/_workitems/edit/2897973)
+
+[AB#2897973](https://dev.azure.com/access-devops/Elay/_workitems/edit/2897973) is a User Story, so the Decisions section goes into `System.Description`.
+Step 1 read the item at `System.Rev` 7; its Description had no Decisions heading yet.
+
+New Description value = the existing Description, unchanged, followed by:
+
+```html
+<h3>Decisions</h3>
+<p><b>D-001 · 2026-11-10 · Shared filter panel package</b><br>
+Question: Should the filter panel move into a shared package that both lists import?<br>
+Answer: a - move it to a shared package with the filter fields passed in; keep the Contacts behaviour unchanged.<br>
+Answered by: Earlier Dev, in the <a href="<message web url>">Teams spec decision thread</a>.<br>
+Links: <a href="https://github.com/elay-io/outreach-front/pull/1931">PR 1931</a>, <a href="https://dev.azure.com/access-devops/Elay/_workitems/edit/2897001">AB#2897001</a></p>
+```
+
+D-001 is an engineering decision: what the user sees does not change, so the acceptance criteria stay as they are.
+If Q2 were later answered `b` (saved filters shared across lists), the user-visible scope changes, so the existing criteria stay and this line is appended to `Microsoft.VSTS.Common.AcceptanceCriteria`:
+
+```html
+<li>A filter saved on the Contacts list also appears in the saved filters on the Sequences list. (D-002, 2026-11-11)</li>
+```
+
+The write is one JSON Patch:
+
+```http
+PATCH https://dev.azure.com/access-devops/Elay/_apis/wit/workitems/2897973?api-version=7.1
+Content-Type: application/json-patch+json
+
+[
+  { "op": "test", "path": "/rev", "value": 7 },
+  { "op": "add", "path": "/fields/System.Description", "value": "<existing Description HTML><h3>Decisions</h3>..." }
+]
+```
+
+Then read the item again: the old Description text is all still there, the D-001 entry is present, and its 3 anchors are intact.

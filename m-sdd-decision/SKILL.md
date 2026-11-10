@@ -6,7 +6,9 @@ description: >
   creator or requester, engineering questions to whoever made the conflicting
   earlier work. Posts one English question thread per ticket to the team's
   Teams spec decision channel (every AB# linked), keeps a decision log, and
-  writes the answered decision back to the ticket as a linked ADO comment.
+  writes each answer back to the ticket as a linked ADO comment and as a dated
+  entry in the work item's Decisions section (acceptance criteria too when the
+  answer changes what must be built).
   Questions for the person running the session are asked in chat, never posted.
   Triggers: spec decision, sdd decision, ask the PO, who should I ask, open
   question on ticket, conflicting earlier work, blocking question, decision log,
@@ -22,7 +24,7 @@ allowed-tools:
 
 # Outreach - SDD decision routing
 
-> **TL;DR** - Load config (0) -> list the open questions and find each owner with evidence (1) -> split: session user in chat, everyone else in one Teams thread per ticket (2) -> build the post (3) -> post or hand back the exact post (4) -> log every question (5) -> collect answers (6) -> write the answer back to the ticket (7).
+> **TL;DR** - Load config (0) -> list the open questions and find each owner with evidence (1) -> split: session user in chat, everyone else in one Teams thread per ticket (2) -> build the post (3) -> post or hand back the exact post (4) -> log every question (5) -> collect answers (6) -> write the answer back to the ticket: a comment plus the work item's Decisions section and acceptance criteria (7).
 
 Built for the Outreach (Elay) team: tickets in Azure DevOps, questions in a Teams spec decision channel.
 The layout below is the Outreach format; do not swap in another team's question style.
@@ -47,6 +49,7 @@ If neither exists, read `config.example.json`, tell the user once to copy it to 
 | Key | Use |
 |---|---|
 | `ado.organization`, `ado.project` | Ticket links and ADO API calls. Defaults `access-devops`, `Elay`. |
+| `ado.decisionsField` | Optional work item type -> field for the Decisions section (Phase 7b). |
 | `sessionUser` | ADO unique name of the person running the session. Questions they own go to chat. If unset, ask once. |
 | `teams.teamId`, `teams.channelId`, `teams.channelName` | The spec decision channel. Ids come only from here - never guess, search for or hard-code them. |
 | `people` | ADO unique name -> Teams `displayName` + `aadUserId` for @mentions. Mention ids come only from here. |
@@ -99,7 +102,7 @@ Otherwise it does not block: name the **default** you will use (normally your re
   6. `Reply in one line: Q1: a - because ...` (one line per question when there are several). A bare `Q1: a` is valid; anything outside the options is `Q1: other - ...`.
 - Keep it short enough to read on a phone. No greetings, sign-offs or recap.
 
-A complete rendered example ([AB#2897973](https://dev.azure.com/access-devops/Elay/_workitems/edit/2897973), shared filter panel package question), its HTML, the Graph payload, a reply, the log entry and the ADO write-back are in `references/example-post.md`.
+A complete rendered example ([AB#2897973](https://dev.azure.com/access-devops/Elay/_workitems/edit/2897973), shared filter panel package question), its HTML, the Graph payload, a reply, the log entry, the ADO comment and the work item update are in `references/example-post.md`.
 Match that layout exactly.
 
 ## Phase 4 - Post or hand back
@@ -140,20 +143,33 @@ Read the thread replies (`GET .../messages/{messageId}/replies`) when the route 
 Parse `Q<n>: <letter|other> - <reason>` per line.
 An answer is valid only from the question's owner, or from someone the owner or session user names in the thread; anything else, or an unclear reply, goes to the session user in chat.
 Update the log entry to `Status: answered` with answer, who and date.
-Do not reply in Teams to confirm; the ticket comment in Phase 7 is the record.
+Do not reply in Teams to confirm; the ticket update in Phase 7 is the record.
 In an SDD feature, hand product answers to `m-sdd-clarify` Phase 2 to fold into the spec (it owns re-approval); engineering answers feed `m-sdd-plan`.
 
 ## Phase 7 - Write back to the ticket
 
-For each answer from someone other than the session user, post an English ADO comment on the ticket (azure-devops MCP comment tool, `az boards work-item update --discussion`, or `POST _apis/wit/workItems/{id}/comments?api-version=7.1-preview.4`).
+Every answered decision lands on the ticket in two places: a comment (7a) and the work item itself (7b).
+The session user's own chat answers get 7b only, unless they also ask for a comment.
+Show the user both drafts (comment HTML, and the before/after of each field) and get an OK before writing.
+
+**7a - Comment.** Post an English ADO comment (azure-devops MCP comment tool, `az boards work-item update --discussion`, or `POST _apis/wit/workItems/{id}/comments?api-version=7.1-preview.4`).
 Use HTML with explicit `<a href>` anchors for every ticket, PR, file and the Teams thread.
-Read the comment back with `$expand=renderedText` and count the anchors before saying it is done.
-The session user's own chat answers go to the log only, unless they ask for a ticket comment.
+Read it back with `$expand=renderedText` and count the anchors before saying it is done.
+
+**7b - Work item.** Update the ticket so it reflects the decision without anyone reading the comments.
+
+1. **Read first:** `GET _apis/wit/workitems/{id}?fields=System.Rev,System.WorkItemType,System.Description,Microsoft.VSTS.TCM.ReproSteps,Microsoft.VSTS.Common.AcceptanceCriteria&api-version=7.1`.
+2. **Pick the field** for the Decisions section: `config.ado.decisionsField[<work item type>]` when set; otherwise `System.Description`, except a Bug uses `Microsoft.VSTS.TCM.ReproSteps` (the field a Bug shows).
+3. **Decisions section:** keep every existing character of the field. If a `<h3>Decisions</h3>` heading already exists, add the entry at the end of that section; otherwise append the heading and the entry at the end of the field. One dated entry per decision, starting with its `D-NNN` id: question, answer, who answered, date, and a link to the Teams thread (or "answered in chat"), with every `AB#` and PR as an `<a href>`. The only existing text this skill may replace is its own entry with the same `D-NNN` (for example open -> answered).
+4. **Acceptance criteria** (`Microsoft.VSTS.Common.AcceptanceCriteria`) change only when the answer changes what must be built. Append the new or changed criterion with a `(D-NNN, <date>)` suffix. Never delete or reword an existing criterion: when the answer contradicts one, leave it and add `Replaces: "<old criterion>"` to the new line, so the product owner can tidy it.
+5. **Write** with one JSON Patch: `PATCH _apis/wit/workitems/{id}?api-version=7.1`, `Content-Type: application/json-patch+json`, body `[{"op":"test","path":"/rev","value":<System.Rev from step 1>}, {"op":"add","path":"/fields/<field>","value":"<full new HTML>"}, ...]`. The `test` op makes the write fail if someone edited the ticket since step 1; then re-read and rebuild from the new text, once. A second failure goes to the user.
+6. **Verify:** read the work item again and confirm the old field text is still all there, the `D-NNN` entry and any new criterion are present, and the anchors are intact. Only then mark the log entry's `Links:` with the ticket update.
 
 ## Never
 
 - Post a question the session user owns, or post any recap, summary or acknowledgement.
 - Write a bare `AB#<id>` or bare URL anywhere this skill writes.
+- Overwrite, reword or delete existing ticket text, or write a work item field without reading it first and checking `/rev`.
 - Guess an owner, a Teams id or a mention id, or commit one.
 - Mark a question non-blocking just to keep going when its answer would change a contract or user-visible scope.
 - Treat a non-owner's reply as the decision.

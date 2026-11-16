@@ -81,6 +81,7 @@ it (see Rule 3). `done` alone is NOT an approval — it means a phase finished i
 ## Artifact locations (per active feature `$id`)
 - Spec:  `specs/$id/spec.md`        Plan: `specs/$id/plan.md`
 - Tasks: `specs/$id/tasks.md`       Analysis: `specs/$id/analysis.md`
+- Acceptance: `specs/$id/acceptance.json` (per-phase criteria with exact steps, written by plan) · Evidence: `specs/$id/evidence/<phase-id>.md` (written by implement). Schema for both: `<skills-root>/m-sdd/acceptance-schema.md`.
 - Design (optional): `specs/$id/design/` — committed, PO-authored **visual reference** (HTML mockups or external links), indexed by `design/README.md`. Read-only input to specify/clarify/plan/analyze; never a tracked phase or gate. Created lazily when a design exists.
 - Plan companions: `specs/$id/{research.md,data-model.md,contracts/}`
 - Checklists (optional, `m-sdd-checklist`): `specs/$id/checklists/<domain>.md`

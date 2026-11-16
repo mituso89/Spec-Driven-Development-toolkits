@@ -32,17 +32,21 @@ description: "SDD phase 3 (optional) — interview the user to resolve spec ambi
   - Before asking a question, check `specs/$id/design/` (if present): a mockup may
     already answer a UI ambiguity. Use it to *inform* the question; the user still
     decides (a design is PO input, not an auto-answer).
+  - To frame a question with repo facts, dispatch the **m-research-helpers** locator or analyzer (when installed) and use their short results instead of reading whole files - this keeps the main context small. Their findings frame the question; they never answer it.
 - Interview the user **one question at a time**; prefer multiple-choice over open-ended. For each: state the ambiguity, give the spec's current assumption (if any) as the default, and let the user confirm or override.
   - **You ask — the user decides.** Never auto-answer an ambiguity from the codebase and move on: repo facts may *inform* how you phrase the question, but the answer is the user's.
   - Stay requirement-first — questions are about user value, scope, and acceptance, never technology or approach (that's `m-sdd-plan`).
-  - Keep it bounded: cover the points that actually affect scope; don't manufacture questions where the Assumption is already safe.
+  - **Be honest and critical.** When a requirement, an Assumption, or the user's answer looks weak (contradicts another requirement, can't be measured, adds scope with little value, or carries a real risk), say so plainly in one or two lines with the reason and a better option. Then let the user decide; never quietly accept a weak decision, and never override one.
+  - **Record what is NOT being built.** Every option the user rejects or defers, and every "not now", goes into the spec's `## Non-Goals (out of scope - not building)` list in plain words, so plan and implement do not build it by accident.
+  - **Keep asking while critical ambiguity remains.** A point is critical when different answers change scope, a user story, a requirement, or a success criterion. Do not write the Clarifications section or mark the phase done while one is open in this interview - there is no question limit for critical points (a point routed to the decision skill below counts as handled: it is tracked in `decisions.md`). Stop when what is left is only safe Assumptions; don't manufacture questions there.
+  - **Keep it short.** One short question per message, short options; accept short answers ("A", "yes", "skip") and do not ask the user to write paragraphs.
 - **Questions someone else owns.** When the person who must decide is not the user running the session (for example the ticket's requester, or the author of earlier work the spec conflicts with) and a project decision skill is installed (`m-sdd-decision`), route that question through it instead of guessing or asking the user to speak for them.
   It finds the owner, asks them, and records the question in `specs/$id/decisions.md` with `Status: open`, `Blocks build: yes|no` and the default used meanwhile (normally the spec's current Assumption).
   The user's own questions stay in this interview as above.
   With no decision skill installed, ask the user as today and note who should confirm the answer.
 
 ## Phase 2 — Record, re-approve & route
-- Append the resolved Q&A under the `## Clarifications` heading in `specs/$id/spec.md` (do not rewrite earlier sections).
+- Append the resolved Q&A under the `## Clarifications` heading in `specs/$id/spec.md` (do not rewrite earlier sections), one short line per answer. Add each rejected or deferred item to the `## Non-Goals (out of scope - not building)` list - the one earlier section clarify extends.
 - **Re-approval gate:** clarify mutates an already-`approved` spec, so its approval is now stale. If any answer changed scope/requirements, reset and re-confirm: `sdd_set_phase "$root" "$id" specify in_progress`, show the user the updated spec, and on their OK `sdd_set_phase "$root" "$id" specify approved`. Pure wording tweaks that change no requirement may keep the existing approval — say which you did.
 - Answers that arrive later through the decision skill come back here: fold them into `## Clarifications` with their `D-NNN` id and apply the same re-approval gate.
 - `sdd_set_phase "$root" "$id" clarify done`; route to `m-sdd-plan` (which `sdd_require`s `specify approved`). If `decisions.md` still has an open blocking entry, say so: plan will stop until it is answered.

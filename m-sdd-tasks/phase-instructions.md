@@ -14,6 +14,7 @@
 - Read `specs/<id>/plan.md`. Collect all `- [ ]` steps into an ordered checklist in `specs/<id>/tasks.md` (start from `.sdd/templates/tasks-template.md` if present).
 - Assign stable IDs `T001, T002, …` in dependency order. Keep each task independently testable. Do not invent work not in the plan.
 - **Traceability + tests:** tag each task with the user-story / success-criterion IDs it serves (`[US#]`, `[SC-###]`). Carry the plan's Testing Strategy into concrete test tasks labelled the same way. UI test tasks name the `design/<screen>` they accept against. Whether missing coverage is blocking is the constitution's call (default: expected, not blocking).
+- **Acceptance links:** read `specs/<id>/acceptance.json` (schema: `m-sdd/acceptance-schema.md`). Tag each task with the plan phase it belongs to and the criterion IDs it helps satisfy, e.g. `[PH1][AC-1.2]`, and keep tasks grouped under one `## PH<n> - <outcome>` heading per phase, in phase order. Every criterion must be served by ≥1 task; a task that serves no criterion still names its phase. If `acceptance.json` is missing, stop and send the user back to the plan phase to write it.
 - **Single source of truth:** once `tasks.md` exists, it is the canonical execution checklist. Replace the plan's `## Tasks` body with a one-line pointer: `See ./tasks.md (canonical).`
 
 ## Phase 2 — Record & route

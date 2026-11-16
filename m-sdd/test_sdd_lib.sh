@@ -137,5 +137,37 @@ for p in specify clarify plan tasks analyze implement issues; do sdd_set_phase "
 assert_eq "$(sdd_get_next "$R6" "$IE")" "complete" "all phases finished -> next is complete"
 rm -rf "$R6"
 
+# --- acceptance.json validation: the documented example is the fixture ---
+R7="$(newroot)"
+awk '/^```json$/{f=1; next} f && /^```$/{exit} f{print}' "$HERE/acceptance-schema.md" > "$R7/acc.json"
+assert_eq "$(sdd_validate_acceptance "$R7/acc.json")" "acceptance: ok" "documented acceptance example is valid"
+printf '%s\n' '### US1 - Export (P1)' '### US2 - Large export (P2)' '- **FR-001:** a' '- **FR-002:** b' \
+  '- **SC-001:** c' '- **SC-002:** d' > "$R7/spec.md"
+assert_eq "$(sdd_validate_acceptance "$R7/acc.json" "$R7/spec.md")" "acceptance: ok" "example covers a matching spec"
+printf '%s\n' '- **FR-003:** extra' >> "$R7/spec.md"
+assert_eq "$(sdd_validate_acceptance "$R7/acc.json" "$R7/spec.md")" \
+  "acceptance: spec requirement FR-003 is not covered by any criterion" "uncovered spec requirement is reported"
+( sdd_validate_acceptance "$R7/acc.json" "$R7/spec.md" >/dev/null ) ; assert_eq "$?" "1" "uncovered requirement fails the check"
+grep -v 'SC-002' "$R7/spec.md" | grep -v 'FR-003' > "$R7/spec2.md"
+assert_eq "$(sdd_validate_acceptance "$R7/acc.json" "$R7/spec2.md")" \
+  "acceptance: criteria cover SC-002, which is not in the spec" "covered ID missing from spec is reported"
+bad() { jq "$1" "$R7/acc.json" > "$R7/bad.json"; sdd_validate_acceptance "$R7/bad.json"; }
+assert_eq "$(bad 'del(.phases)')" "acceptance: phases must be a non-empty array" "missing phases rejected"
+assert_eq "$(bad '.created_at = "yesterday"')" \
+  "acceptance: created_at must be an ISO-8601 date-time, e.g. 2026-01-31T09:00:00Z" "bad created_at rejected"
+assert_eq "$(bad '.phases[0].acceptance_criteria[0].steps[0].type = "auto"')" \
+  'acceptance: phases[0].acceptance_criteria[0].steps[0].type must be "automated" or "manual"' "unknown step type rejected"
+assert_eq "$(bad 'del(.phases[1].acceptance_criteria[0].steps[1].expect)')" \
+  "acceptance: phases[1].acceptance_criteria[0].steps[1].expect must state the pass condition" "step without expect rejected"
+assert_eq "$(bad 'del(.phases[0].acceptance_criteria[0].steps[0].run)')" \
+  "acceptance: phases[0].acceptance_criteria[0].steps[0].run must be the exact command to run" "automated step without run rejected"
+assert_eq "$(bad '.phases[1].acceptance_criteria[0].id = "AC-1.1"')" "acceptance: duplicate criterion id: AC-1.1" "duplicate criterion id rejected"
+assert_eq "$(bad '.phases[0].acceptance_criteria = []')" \
+  "acceptance: phases[0].acceptance_criteria must be a non-empty array" "phase without criteria rejected"
+printf '{not json\n' > "$R7/broken.json"
+( sdd_validate_acceptance "$R7/broken.json" >/dev/null ) ; assert_eq "$?" "1" "invalid JSON rejected"
+( sdd_validate_acceptance "$R7/missing.json" >/dev/null ) ; assert_eq "$?" "1" "missing file rejected"
+rm -rf "$R7"
+
 printf '\n%d passed, %d failed\n' "$PASS" "$FAIL"
 [ "$FAIL" -eq 0 ]

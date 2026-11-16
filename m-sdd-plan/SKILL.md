@@ -1,11 +1,11 @@
 ---
 name: m-sdd-plan
-description: "SDD phase 4 — technical implementation plan via m-writing-plans, written to specs/<id>/plan.md (+ research/data-model/contracts). Routed by m-sdd."
+description: "SDD phase 4 — technical implementation plan via m-writing-plans, written to specs/<id>/plan.md (+ acceptance.json, research/data-model/contracts). Routed by m-sdd."
 ---
 
 # SDD — Plan
 
-> **TL;DR** — Gate on an approved spec (0) → delegate to **m-writing-plans**, redirecting output to `specs/<id>/plan.md` (1) → add companion artifacts, **get human approval & mark `approved`**, route (2). Read `<skills-root>/m-sdd/_shared.md` first.
+> **TL;DR** — Gate on an approved spec (0) → delegate to **m-writing-plans**, redirecting output to `specs/<id>/plan.md` (1) → add companion artifacts and `acceptance.json`, **get human approval & mark `approved`**, route (2). Read `<skills-root>/m-sdd/_shared.md` first.
 
 **Pipeline:** clarify → **plan** → tasks.
 
@@ -21,16 +21,19 @@ description: "SDD phase 4 — technical implementation plan via m-writing-plans,
 
 ## Phase 1 — Delegate to m-writing-plans
 - `sdd_set_phase "$root" "$id" plan in_progress`
-- Invoke **m-writing-plans** with four overrides. Mechanism: include the overrides below verbatim in the context you give m-writing-plans — it cannot honor rules it never sees.
+- **Research with the read-only helpers** (`m-research-helpers`, when installed): dispatch the locator to find the files and symbols the spec touches, the pattern finder for existing examples to copy, the analyzer for any flow the change must hook into, and the web researcher for external library/API facts. Pass their short results (paths, line ranges, cited facts) into m-writing-plans instead of reading whole files here - this keeps the main context small. Without the helpers, do the same searches inline and read only line ranges.
+- Invoke **m-writing-plans** with five overrides. Mechanism: include the overrides below verbatim in the context you give m-writing-plans — it cannot honor rules it never sees.
   1. Read the spec from `specs/$id/spec.md`; write the plan to `specs/$id/plan.md` (start from `.sdd/templates/plan-template.md`), NOT to `docs/plans/`. The spec is requirements-only (no HOW) — all tech decisions are made *here*; honor any technology preferences the spec parked under **Assumptions**. If `specs/$id/design/` exists, read `design/README.md` + its screens as the **visual implementation reference** — derive components, layouts, and states from the mockups (they are read-only; do not edit them).
   2. **Do NOT offer the execution handoff** at the end — implementation is the separate `m-sdd-implement` phase. Return control here.
   3. **Fill the `## Testing Strategy` section** of the plan: map every user story and **success criterion (SC-###)** from the spec to how it will be verified, choose test levels, and state how to run tests. Whether coverage is *mandatory* or merely *expected* follows the constitution's testing principle (default: expected, not blocking, if none is defined). Keep the spec unchanged — strategy lives here, the acceptance contract stays in the spec.
   4. **Ground the plan in the structural layer** (from Phase 0): use `.sdd/repo-map.md` (or the code MCP) to base file/architecture choices on what already exists, and **explicitly name the existing symbols/conventions to reuse** (factories, base classes, validators, route/registration patterns) instead of hand-rolling. Prefer extending an existing module over creating a new one; when new code is unavoidable, match the neighbors the map reveals. This makes the plan the carrier of grounding into implementation.
+  5. **Group the tasks into phases** under `## Phases` (`PH1`, `PH2`, ...): each phase is a shippable slice with a one-line outcome, in build order. Each phase gets acceptance criteria in Phase 2.
 
-## Phase 2 — Companions, approval gate & route
+## Phase 2 — Companions, acceptance, approval gate & route
 - If the spec implies them, create `specs/$id/research.md`, `specs/$id/data-model.md`, and contracts under `specs/$id/contracts/`.
-- **Human approval gate (load-bearing):** present the plan to the user and get explicit approval — architecture and task decomposition are cheap to fix on paper, expensive in code. Only on approval: `sdd_set_phase "$root" "$id" plan approved`.
-- If the user requests changes, revise and re-present; leave the phase `in_progress` (do NOT mark `approved`). Never advance to tasks/implement on an unapproved plan.
+- **Write `specs/$id/acceptance.json`** next to `plan.md`, following `<skills-root>/m-sdd/acceptance-schema.md` (the single schema reference): one entry per plan phase, each with acceptance criteria whose steps are exact and checkable - commands to run (`automated`) or things to verify (`manual`), each with its pass condition. Every spec `US#`/`FR-###`/`SC-###` must appear in some criterion's `covers`. Then run `sdd_validate_acceptance "specs/$id/acceptance.json" "specs/$id/spec.md"` and fix every problem it prints before the approval gate.
+- **Human approval gate (load-bearing):** present the plan and its acceptance criteria to the user and get explicit approval — architecture and task decomposition are cheap to fix on paper, expensive in code. Only on approval: `sdd_set_phase "$root" "$id" plan approved`.
+- If the user requests changes, revise and re-present; leave the phase `in_progress` (do NOT mark `approved`). Never advance to tasks/implement on an unapproved plan. `acceptance.json` is part of the plan: editing it after approval resets plan approval the same way.
 - Route to `m-sdd-tasks`.
 
 > Optional companions: if the spec involves an API or module boundary, run `m-api-and-interface-design` while drafting the plan — its output lands in the plan's Contracts section and/or `specs/$id/contracts/`. If the spec involves user-facing UI, run `m-frontend-ui-engineering` — its guidance lands in the plan's design notes. Neither blocks the approval gate.
